@@ -23,6 +23,12 @@
       "url": "https://www.tiktok.com/@strom_u"
     }
   ],
+  "public_stats": {
+    "enabled": true,
+    "api": "https://gateway-eu.umami.is/api",
+    "share_id": "YLIFwiUKzl68F7KI",
+    "since": "2026-11-19"
+  },
   "game_version": "1.30 (PC Stable, Update 3 · 1.30.164289)",
   "platform": "ПК, ванильная игра (без модов)",
   "checked_date": "19.11.2026",

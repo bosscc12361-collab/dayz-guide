@@ -222,6 +222,7 @@
     let html = '<div class="hero">' + BOLT +
       '<p class="brand">' + esc(m.author || 'STROM') + '</p>' +
       '<h2>DayZ Guide</h2><p>' + esc(m.app_subtitle) + '</p></div>';
+    if (m.public_stats && m.public_stats.enabled) html += '<div class="live" id="live" hidden></div>';
     html += '<a href="#search" class="searchbox" style="display:block;text-decoration:none">' + ICONS.search +
       '<input type="text" readonly tabindex="-1" placeholder="Поиск по всем разделам…" style="pointer-events:none"></a>';
     html += '<div class="grid">';
@@ -245,6 +246,7 @@
     html += footer();
     $view.innerHTML = html;
     void first;
+    liveStats.show();
   }
 
   function viewSection(sec, params) {
@@ -507,6 +509,58 @@
     window.scrollTo(0, y);
     trackView('/' + parts.join('/'));
   }
+
+  // ---------- публичный счётчик на главной: онлайн + всего посетителей ----------
+  // Цифры берутся из публичной ссылки Umami (настройки в data/meta.json → public_stats).
+  const liveStats = (() => {
+    let token = null, total = null, totalAt = 0, online = null, timer = null;
+    const plural = (n, a, b, c) => { const m10 = n % 10, m100 = n % 100;
+      return m10 === 1 && m100 !== 11 ? a : (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? b : c); };
+    const fmt = (n) => Number(n).toLocaleString('ru-RU');
+    async function api(path) {
+      const cfg = state.meta.public_stats;
+      if (!token) {
+        const s = await fetch(cfg.api + '/share/' + encodeURIComponent(cfg.share_id)).then((r) => r.json());
+        token = { t: s.token, w: s.websiteId };
+      }
+      const r = await fetch(cfg.api + '/websites/' + token.w + path, { headers: { 'x-umami-share-token': token.t, 'x-umami-share-context': '1' } });
+      if (r.status === 401) { token = null; throw new Error('401'); }
+      if (!r.ok) throw new Error(String(r.status));
+      return r.json();
+    }
+    function render() {
+      const el = document.getElementById('live');
+      if (!el || (online == null && total == null)) return;
+      let h = '';
+      if (online != null) h += '<span class="live-item"><i class="dot"></i>онлайн <b>' + fmt(online) + '</b></span>';
+      if (total != null) h += '<span class="live-item">👥 <b>' + fmt(total) + '</b> ' + plural(total, 'посетитель', 'посетителя', 'посетителей') + '</span>';
+      el.innerHTML = h;
+      el.hidden = false;
+    }
+    async function refresh() {
+      const cfg = state.meta.public_stats;
+      if (!cfg || !cfg.enabled || !navigator.onLine) return;
+      try {
+        const a = await api('/active');
+        online = Math.max(1, a.visitors || a.x || 0); // ты сам тоже на сайте
+        if (Date.now() - totalAt > 5 * 60 * 1000) {
+          const since = new Date(cfg.since || '2026-01-01').getTime();
+          const st = await api('/stats?startAt=' + since + '&endAt=' + Date.now());
+          total = (st.visitors && typeof st.visitors === 'object') ? st.visitors.value : st.visitors;
+          totalAt = Date.now();
+        }
+      } catch (e) { /* нет сети или ссылка выключена — просто не показываем */ }
+      render();
+    }
+    return {
+      show() {
+        render();
+        refresh();
+        clearInterval(timer);
+        timer = setInterval(() => { if (document.getElementById('live')) refresh(); else clearInterval(timer); }, 30000);
+      }
+    };
+  })();
 
   // ---------- статистика (Umami, без cookie) ----------
   // Каждая карточка считается отдельной страницей: /diseases/cholera, /weapons/mosin и т.д.
