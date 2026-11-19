@@ -77,6 +77,8 @@
     star: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>',
     chev: '<svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     search: '<svg class="s-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+    book: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5zM4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>',
+    ext: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" style="opacity:.6"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     share: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 15V3M7.5 7.5L12 3l4.5 4.5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
   };
 
@@ -95,6 +97,13 @@
         '<a class="social ' + (x.id === 'telegram' ? 'tg' : '') + '" href="' + esc(x.url) + '" target="_blank" rel="noopener">' +
         (SOCIAL_ICONS[x.id] || '') + '<span>' + esc(x.title) + '</span><small>' + esc(x.handle || '') + '</small></a>').join('') +
       '</div>';
+  }
+
+  // Картинка карточки: "image": "img/rags.jpg" или { "src": "img/rags.jpg", "caption": "Скриншот: STROM" }
+  function img(it) {
+    if (!it.image) return null;
+    const o = typeof it.image === 'string' ? { src: it.image } : it.image;
+    return o && o.src ? o : null;
   }
 
   let toastTimer;
@@ -178,11 +187,14 @@
     const on = state.favs.has(k);
     const b = badges(sec, it);
     return '<div class="row">' +
-      '<a class="r-main" href="#' + esc(sec.id) + '/' + esc(it.id) + '">' +
+      '<a class="r-main' + (img(it) ? ' has-img' : '') + '" href="#' + esc(sec.id) + '/' + esc(it.id) + '">' +
+        (img(it) ? '<img class="r-thumb" src="' + esc(img(it).src) + '" alt="" loading="lazy" decoding="async">' : '') +
+        '<span class="r-body">' +
         (showSection ? '<div class="r-sec">' + esc(sec.icon) + ' ' + esc(sec.title) + '</div>' : '') +
         '<div class="r-title">' + esc(it.title) + (it.title_en ? ' <span class="r-en">(' + esc(it.title_en) + ')</span>' : '') + '</div>' +
         (it.summary ? '<div class="r-sum">' + esc(it.summary) + '</div>' : '') +
         (b ? '<div class="r-meta">' + b + '</div>' : '') +
+        '</span>' +
       '</a>' +
       '<button class="star' + (on ? ' on' : '') + '" data-fav="' + esc(k) + '" aria-pressed="' + on + '" aria-label="Избранное">' + ICONS.star + '</button>' +
     '</div>';
@@ -303,6 +315,11 @@
       '<button class="star' + (on ? ' on' : '') + '" data-fav="' + esc(k) + '" aria-pressed="' + on + '" aria-label="Избранное">' + ICONS.star + '</button></div>';
     const b = badges(sec, it);
     if (b) html += '<div class="d-badges">' + b + '</div>';
+    const pic = img(it);
+    if (pic) {
+      html += '<figure class="d-img"><img src="' + esc(pic.src) + '" alt="' + esc(it.title) + '" decoding="async">' +
+        (pic.caption ? '<figcaption>' + esc(pic.caption) + '</figcaption>' : '') + '</figure>';
+    }
     if (it.summary) html += '<p class="d-sum">' + esc(it.summary) + '</p>';
     if (it.needs_check && state.meta.show_needs_check) {
       html += '<div class="needs-check">⚠ Эту карточку ещё нужно сверить с актуальной версией игры' +
@@ -315,6 +332,10 @@
     html += '<div class="d-actions">' +
       '<button class="btn' + (on ? ' on' : '') + '" data-fav="' + esc(k) + '">' + '<span class="lbl">' + (on ? 'В избранном' : 'В избранное') + '</span></button>' +
       '<button class="btn" data-share>' + ICONS.share + 'Поделиться</button></div>';
+    if (it.wiki && /^https:\/\//.test(it.wiki)) {
+      html += '<a class="btn wiki" href="' + esc(it.wiki) + '" target="_blank" rel="noopener">' + ICONS.book +
+        'Открыть в DayZ Wiki' + ICONS.ext + '</a>';
+    }
     html += '</article>' + footer();
     $view.innerHTML = html;
 

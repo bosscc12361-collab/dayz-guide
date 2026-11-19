@@ -17,7 +17,8 @@
       "Флаг даёт 6 тряпок (поднятый на флагштоке нельзя, с 1.30)"
     ],
     "tool": "Любой нож или острый предмет (каменный нож тоже подойдёт)",
-    "result": "Тряпки (Rags)"
+    "result": "Тряпки (Rags)",
+    "wiki": "https://dayz.wiki.gg/wiki/Rags"
   },
   {
     "id": "stone-knife",
@@ -36,7 +37,8 @@
       "Ещё один маленький камень"
     ],
     "tool": "Не нужен: соедини камни в руках",
-    "result": "Каменный нож (Stone Knife)"
+    "result": "Каменный нож (Stone Knife)",
+    "wiki": "https://dayz.wiki.gg/wiki/Stone_Knife"
   },
   {
     "id": "bone-knife",
@@ -55,7 +57,8 @@
       "2 кости (Bones) — или 1 кость + большой камень/скала"
     ],
     "tool": "Не нужен: держи кости в руках и зажми ЛКМ",
-    "result": "Костяной нож (Bone Knife)"
+    "result": "Костяной нож (Bone Knife)",
+    "wiki": "https://dayz.wiki.gg/wiki/Bone_Knife"
   },
   {
     "id": "splint",
@@ -76,7 +79,8 @@
       "или: изолента (Duct Tape) + 2 короткие палки"
     ],
     "tool": "Не нужен",
-    "result": "Шина (Splint)"
+    "result": "Шина (Splint)",
+    "wiki": "https://dayz.wiki.gg/wiki/Splint"
   },
   {
     "id": "short-stick",
@@ -97,7 +101,8 @@
     ],
     "tool": "Нож или руки (для дров — топор)",
     "result": "Короткие палки (Short Stick)",
-    "text": "Длинную палку можно отломать от **куста**: подойди к кусту и выбери действие."
+    "text": "Длинную палку можно отломать от **куста**: подойди к кусту и выбери действие.",
+    "wiki": "https://dayz.wiki.gg/wiki/Short_Stick"
   },
   {
     "id": "sharpened-stick",
@@ -115,7 +120,8 @@
       "Длинная палка (Long Wooden Stick)"
     ],
     "tool": "Любой нож",
-    "result": "Заточенная палка (Sharpened Stick)"
+    "result": "Заточенная палка (Sharpened Stick)",
+    "wiki": "https://dayz.wiki.gg/wiki/Sharpened_Stick"
   },
   {
     "id": "fireplace",
@@ -135,7 +141,8 @@
     ],
     "tool": "Не нужен. Разжечь: спички, зажигалка, ручная дрель, фальшфейер",
     "result": "Костёр (Fireplace)",
-    "text": "Можно ещё проще: положи растопку на землю и сразу подожги. **8 камней** дают каменное кольцо, **16 камней** — каменную печь."
+    "text": "Можно ещё проще: положи растопку на землю и сразу подожги. **8 камней** дают каменное кольцо, **16 камней** — каменную печь.",
+    "wiki": "https://dayz.wiki.gg/wiki/Fireplace"
   },
   {
     "id": "hand-drill",
@@ -155,7 +162,8 @@
       "Короткая палка (Short Stick)"
     ],
     "tool": "Не нужен (кору срезают ножом с дерева)",
-    "result": "Ручная дрель (Hand Drill Kit)"
+    "result": "Ручная дрель (Hand Drill Kit)",
+    "wiki": "https://dayz.wiki.gg/wiki/Hand_Drill_Kit"
   },
   {
     "id": "torch",
@@ -176,7 +184,8 @@
     ],
     "tool": "Не нужен",
     "result": "Факел (Torch)",
-    "text": "Горит, пока не прогорят тряпки. Добавь **жир (Animal Fat)** или **бензин**, чтобы горел дольше. Подкидывать тряпки можно и в горящий факел. Длинный факел: длинная палка + тряпки."
+    "text": "Горит, пока не прогорят тряпки. Добавь **жир (Animal Fat)** или **бензин**, чтобы горел дольше. Подкидывать тряпки можно и в горящий факел. Длинный факел: длинная палка + тряпки.",
+    "wiki": "https://dayz.wiki.gg/wiki/Torch"
   },
   {
     "id": "rope",
@@ -195,7 +204,8 @@
       "6 тряпок (Rags) + ещё 6 тряпок"
     ],
     "tool": "Не нужен",
-    "result": "Верёвка (Rope)"
+    "result": "Верёвка (Rope)",
+    "wiki": "https://dayz.wiki.gg/wiki/Rope"
   },
   {
     "id": "courier-bag",
@@ -215,7 +225,8 @@
       "Верёвка (Rope)"
     ],
     "tool": "Не нужен",
-    "result": "Импровизированная сумка (Improvised Courier Bag)"
+    "result": "Импровизированная сумка (Improvised Courier Bag)",
+    "wiki": "https://dayz.wiki.gg/wiki/Burlap_Courier_Bag"
   },
   {
     "id": "burlap-backpack",
@@ -234,7 +245,8 @@
       "3 короткие палки (Short Stick)"
     ],
     "tool": "Не нужен",
-    "result": "Импровизированный рюкзак (Improvised Backpack)"
+    "result": "Импровизированный рюкзак (Improvised Backpack)",
+    "wiki": "https://dayz.wiki.gg/wiki/Burlap_Backpack"
   },
   {
     "id": "leather-backpack",
@@ -254,7 +266,8 @@
       "Кожаная сумка + 3 короткие палки → рюкзак"
     ],
     "tool": "Нож (снять шкуру с туши)",
-    "result": "Импровизированный кожаный рюкзак (Improvised Leather Backpack)"
+    "result": "Импровизированный кожаный рюкзак (Improvised Leather Backpack)",
+    "wiki": "https://dayz.wiki.gg/wiki/Fur_Backpack"
   },
   {
     "id": "fishing-rod",
@@ -274,7 +287,8 @@
       "Верёвка (Rope)"
     ],
     "tool": "Не нужен",
-    "result": "Простая удочка (Simple Fishing Rod)"
+    "result": "Простая удочка (Simple Fishing Rod)",
+    "wiki": "https://dayz.wiki.gg/wiki/Simple_Fishing_Rod"
   },
   {
     "id": "wooden-hook",
@@ -293,7 +307,8 @@
       "Короткая палка (Short Stick)"
     ],
     "tool": "Нож",
-    "result": "Деревянный крючок (Wooden Hook)"
+    "result": "Деревянный крючок (Wooden Hook)",
+    "wiki": "https://dayz.wiki.gg/wiki/Wooden_Fishing_Hook"
   },
   {
     "id": "spear",
@@ -313,7 +328,8 @@
       "Каменный нож (или костяной нож)"
     ],
     "tool": "Не нужен",
-    "result": "Импровизированное копьё (Improvised Spear)"
+    "result": "Импровизированное копьё (Improvised Spear)",
+    "wiki": "https://dayz.wiki.gg/wiki/Improvised_Spear"
   },
   {
     "id": "bow",
@@ -334,7 +350,8 @@
     ],
     "tool": "—",
     "result": "—",
-    "text": "Если нужна тихая дальнобойная альтернатива, ищи **арбалет (Crossbow)** и болты. Самодельные болты (Improvised Bolt) крафтятся."
+    "text": "Если нужна тихая дальнобойная альтернатива, ищи **арбалет (Crossbow)** и болты. Самодельные болты (Improvised Bolt) крафтятся.",
+    "wiki": "https://dayz.wiki.gg/wiki/Crossbow"
   },
   {
     "id": "improvised-clothes",
@@ -376,7 +393,8 @@
       "Кол-во зависит от части: капюшон, накидка, куртка, полный костюм"
     ],
     "tool": "Нож",
-    "result": "Маскхалат (Ghillie)"
+    "result": "Маскхалат (Ghillie)",
+    "wiki": "https://dayz.wiki.gg/wiki/Ghillie_Suit"
   },
   {
     "id": "bottle-suppressor",
@@ -396,6 +414,7 @@
       "Изолента (Duct Tape)"
     ],
     "tool": "Не нужен",
-    "result": "Самодельный глушитель"
+    "result": "Самодельный глушитель",
+    "wiki": "https://dayz.wiki.gg/wiki/Plastic_Bottle_Suppressor"
   }
 ]

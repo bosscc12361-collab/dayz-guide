@@ -21,7 +21,8 @@
       "Швейный набор (Sewing Kit)",
       "Дезинфицирующий спрей или спиртовая настойка — обработать заранее"
     ],
-    "needs_check": false
+    "needs_check": false,
+    "wiki": "https://dayz.wiki.gg/wiki/Bleeding"
   },
   {
     "id": "disinfect",
@@ -43,7 +44,8 @@
       "Спиртовая настойка (Alcoholic Tincture)",
       "Йод (Iodine Tincture)"
     ],
-    "needs_check": false
+    "needs_check": false,
+    "wiki": "https://dayz.wiki.gg/wiki/Disinfectant_Spray"
   },
   {
     "id": "fracture",
@@ -65,7 +67,8 @@
       "Морфин (Morphine Auto-Injector) — по желанию"
     ],
     "text": "Без шины ходьба и бег наносят **шок**, можно потерять сознание.",
-    "needs_check": false
+    "needs_check": false,
+    "wiki": "https://dayz.wiki.gg/wiki/Splint"
   },
   {
     "id": "shock",
@@ -86,7 +89,8 @@
       "Эпинефрин (Epinephrine Auto-Injector)"
     ],
     "text": "Если крови меньше 3000, эпинефрин поможет ненадолго: шок продолжит расти, пока не восполнишь кровь.",
-    "needs_check": false
+    "needs_check": false,
+    "wiki": "https://dayz.wiki.gg/wiki/Shock"
   },
   {
     "id": "blood",
@@ -106,7 +110,8 @@
       "Физраствор (Saline Bag IV)",
       "Пакет крови (Blood Bag IV)"
     ],
-    "needs_check": false
+    "needs_check": false,
+    "wiki": "https://dayz.wiki.gg/wiki/Blood"
   },
   {
     "id": "blood-types",
@@ -125,7 +130,8 @@
     "items": [
       "Тест крови (Blood Testing Kit)"
     ],
-    "needs_check": false
+    "needs_check": false,
+    "wiki": "https://dayz.wiki.gg/wiki/Blood_Test_Kit"
   },
   {
     "id": "transfusion",
@@ -146,7 +152,8 @@
       "IV Start Kit",
       "Blood Testing Kit"
     ],
-    "needs_check": false
+    "needs_check": false,
+    "wiki": "https://dayz.wiki.gg/wiki/Blood_Collection_Kit"
   },
   {
     "id": "health",
@@ -165,6 +172,7 @@
       "Еда",
       "Вода"
     ],
-    "needs_check": false
+    "needs_check": false,
+    "wiki": "https://dayz.wiki.gg/wiki/Health"
   }
 ]
