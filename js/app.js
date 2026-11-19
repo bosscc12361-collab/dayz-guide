@@ -107,6 +107,7 @@
   }
 
   let toastTimer;
+  window.dzToast = (m) => toast(m);
   function toast(msg) {
     $toast.textContent = msg;
     $toast.classList.add('show');
@@ -139,6 +140,17 @@
       state.byId[s.id] = s;
       for (const it of s.items) it._search = buildSearchText(s, it);
     }
+    // карта Чернаруси: населённые пункты тоже ищутся через поиск
+    try {
+      state.map = await getJSON('data/map.json');
+      const sec = { id: 'map', title: 'Карта', icon: '🗺️', fields: [], items: [] };
+      sec.items = state.map.towns.map((t) => ({ id: t.id, title: t.name, title_en: t.en, summary: t.big ? 'Город на карте Чернаруси' : 'Деревня на карте Чернаруси', tags: ['карта', 'город'] }))
+        .concat(state.map.military.map((m) => ({ id: m.id, title: m.name, summary: 'Военный объект на карте', tags: ['карта', 'военка', 'военная база'] })))
+        .concat(state.map.routes.map((r) => ({ id: r.id, title: r.title, summary: (r.verdict === 'good' ? '✅ Хороший маршрут: ' : '❌ Ошибка новичка: ') + r.summary, tags: ['маршрут', 'карта'] })));
+      sec.items.forEach((it) => { it._search = norm([it.title, it.title_en, it.summary, it.tags.join(' ')].join(' ')); });
+      state.mapSec = sec;
+      state.byId.map = sec;
+    } catch (e) { console.warn('Карта не загрузилась', e); }
   }
 
   function buildSearchText(sec, it) {
@@ -233,6 +245,10 @@
         '<span><span class="t-title">' + esc(s.title) + '</span><br><span class="t-short">' + esc(s.short || '') + '</span></span>' +
         (wide ? '' : '<span class="t-count">' + s.items.length + '</span>') +
       '</a>';
+      if (wide && state.map) {
+        html += '<a class="tile wide map-tile" href="#map"><span class="t-ico">🗺️</span>' +
+          '<span><span class="t-title">Карта Чернаруси</span><br><span class="t-short">Колонки, больницы, полиция, маршруты новичка</span></span></a>';
+      }
     });
     html += '</div>';
 
@@ -373,7 +389,7 @@
     const tokens = norm(q).split(' ').filter(Boolean);
     if (!tokens.length) return [];
     const out = [];
-    for (const s of state.sections) {
+    for (const s of state.sections.concat(state.mapSec ? [state.mapSec] : [])) {
       for (const it of s.items) {
         if (!tokens.every((t) => it._search.includes(t))) continue;
         const t = norm(it.title) + ' ' + norm(it.title_en);
@@ -463,6 +479,30 @@
       '</div>' + footer();
   }
 
+  function viewMap(focusId) {
+    setChrome('Карта Чернаруси', null, true);
+    if (!state.map || !window.DZMap) { $view.innerHTML = '<div class="empty">Карта не загрузилась. Проверь интернет и обнови страницу.</div>'; return; }
+    const M = state.map;
+    const chips = window.DZMap.LAYERS.map((l) => '<button class="chip" data-layer-toggle="' + l.id + '">' + l.icon + ' ' + esc(l.title) + '</button>').join('');
+    const card = (r) => '<div class="route-card ' + r.verdict + '"><div class="rc-title">' + (r.verdict === 'good' ? '✅ ' : '❌ ') + esc(r.title) + '</div>' +
+      window.DZMap.routeHTML(r) + '<button class="btn" data-route="' + esc(r.id) + '">🧭 Показать на карте</button></div>';
+    $view.innerHTML = '<div class="map-page">' +
+      '<div class="chips map-layers">' + chips + '</div>' +
+      '<div class="map-wrap"><div class="map-ctrl">' +
+        '<button data-zoom="in" aria-label="Приблизить">+</button><button data-zoom="out" aria-label="Отдалить">−</button><button data-zoom="fit" aria-label="Вся карта">⤢</button>' +
+      '</div><div class="map-sheet" hidden></div></div>' +
+      '<p class="map-hint">Двигай карту пальцем, приближай двумя пальцами или двойным тапом. Тап по значку — подробности.</p>' +
+      '<div class="h-section">✅ Хорошие маршруты для новичка</div>' + M.routes.filter((r) => r.verdict === 'good').map(card).join('') +
+      '<div class="h-section">❌ Частые ошибки новичков</div>' + M.routes.filter((r) => r.verdict !== 'good').map(card).join('') +
+      '<p class="map-note">' + esc(M.note) + ' Данные проверены: ' + esc(M.checked) + '. Оценка маршрутов: по данным игры (колонки, медицина, полиция, газ и военные базы в пределах ~400 м от пути) и опыту игроков.</p>' +
+      footer() + '</div>';
+    window.DZMap.mount($view.querySelector('.map-page'), M, focusId, (id) => {
+      const h = '#map' + (id ? '/' + id : '');
+      if (h !== (location.hash || '#')) { replaceHash(h); if (id) trackView('/map/' + id); }
+    });
+    $view.querySelectorAll('[data-route]').forEach((b) => b.addEventListener('click', () => window.DZMap.select(b.dataset.route)));
+  }
+
   function viewNotFound() {
     setChrome('Не найдено', null, true);
     $view.innerHTML = '<div class="empty">Такой карточки нет. Возможно, её переименовали.<br><br><a href="#">На главную</a></div>';
@@ -496,6 +536,7 @@
     else if (parts[0] === 'search') viewSearch(params);
     else if (parts[0] === 'fav') viewFav();
     else if (parts[0] === 'about') viewAbout();
+    else if (parts[0] === 'map') viewMap(parts[1]);
     else {
       const sec = state.byId[parts[0]];
       if (!sec) viewNotFound();
