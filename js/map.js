@@ -7,7 +7,6 @@
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
   const LAYERS = [
-    { id: 'buildings', title: 'Здания', icon: '🏠', on: true },
     { id: 'water', title: 'Колонки', icon: '💧', on: true },
     { id: 'medical', title: 'Медицина', icon: '✚', on: true },
     { id: 'police', title: 'Полиция', icon: '🚓', on: true },
@@ -458,10 +457,6 @@
       '<div><span class="lg-i lg-pol">P</span>Полиция</div><div><span class="lg-i lg-mil">★</span>Военка / аэродром</div>' +
       '<div><span class="lg-i">☣</span>Газовая зона</div><div><span class="lg-i lg-spawn"></span>Зона спавна</div>' +
       '<div><span class="lg-i lg-hunt">▲</span>Охотничья вышка</div><div><span class="lg-i">🏁</span>Финиш маршрута</div></div>' +
-      '<div class="lg-title">Здания</div><div class="lg-grid">' +
-      '<div>' + b(BCOL.Town, 'Жилые дома') + '</div><div>' + b(BCOL.Industrial, 'Промзона') + '</div><div>' + b(BCOL.Farm, 'Фермы') + '</div>' +
-      '<div>' + b(BCOL.Military, 'Военные') + '</div><div>' + b(BCOL.Police, 'Полиция') + '</div><div>' + b(BCOL.Medic, 'Медицина') + '</div>' +
-      '<div>' + b(BCOL.Firefighter, 'Пожарные') + '</div><div>' + b(BCOL.Hunting, 'Охота') + '</div></div>' +
       '<div class="lg-title">Зоны лута (слой 🎯)</div><div class="lg-grid">' +
       [1, 2, 3, 4].map((t) => '<div>' + b(TSOLID[t], 'Tier ' + t) + '</div>').join('') + '</div>' +
       '<p class="lg-note">Чем дальше от побережья на северо-запад, тем выше тир и лучше лут. Дорог на схеме пока нет.</p>';

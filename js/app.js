@@ -496,17 +496,14 @@
         'На компьютере достаточно навести мышку. «?» — обозначения.</p>' +
       '<div class="h-section">✅ Хорошие маршруты для новичка</div>' + M.routes.filter((r) => r.verdict === 'good').map(card).join('') +
       '<div class="h-section">❌ Частые ошибки новичков</div>' + M.routes.filter((r) => r.verdict !== 'good').map(card).join('') +
-      '<p class="map-note">' + esc(M.note) + ' Здания нарисованы по точкам лута из официальных данных, поэтому их форма приблизительная. ' +
+      '<p class="map-note">' + esc(M.note) + ' ' +
         esc(M.loot_note || '') + ' Данные проверены: ' + esc(M.checked) + '.</p>' +
       footer() + '</div>';
     const nav = (id) => {
       const h = '#map' + (id ? '/' + id : '');
       if (h !== (location.hash || '#')) { replaceHash(h); if (id) trackView('/map/' + id); }
     };
-    window.DZMap.mount($view.querySelector('.map-page'), M, state.mapBuildings || null, focusId, nav);
-    if (!state.mapBuildings) {
-      getJSON('data/map-buildings.json').then((b) => { state.mapBuildings = b; window.DZMap.setBuildings(b); }).catch(() => {});
-    }
+    window.DZMap.mount($view.querySelector('.map-page'), M, null, focusId, nav);
     $view.querySelectorAll('[data-route]').forEach((btn) => btn.addEventListener('click', () => window.DZMap.select(btn.dataset.route)));
   }
 
