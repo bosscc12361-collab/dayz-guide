@@ -498,10 +498,10 @@
         lg.innerHTML = legendHTML(); lg.hidden = !lg.hidden;
         const c = lg.querySelector('.tip-close'); if (c) c.addEventListener('click', () => { lg.hidden = true; });
       });
-      requestAnimationFrame(() => {
+      setTimeout(() => {
         resizeCanvas(); fitAll();
         if (focusId) select(focusId, false);
-      });
+      }, 0);
       window.addEventListener('resize', onResize);
     },
     setBuildings(b) { B = b; requestDraw(); },
