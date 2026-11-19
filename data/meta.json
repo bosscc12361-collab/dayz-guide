@@ -49,6 +49,77 @@
       ]
     },
     {
+      "id": "controls",
+      "file": "controls.json",
+      "title": "Управление",
+      "icon": "⌨️",
+      "short": "Клавиши на ПК: бег, инвентарь, голос",
+      "fields": [
+        {
+          "key": "keys",
+          "label": "Клавиши",
+          "type": "keys"
+        },
+        {
+          "key": "tip",
+          "label": "Совет"
+        }
+      ]
+    },
+    {
+      "id": "hud",
+      "file": "hud.json",
+      "title": "Значки на экране",
+      "icon": "🩻",
+      "short": "Что значат иконки и их цвета",
+      "fields": [
+        {
+          "key": "look",
+          "label": "Как выглядит"
+        },
+        {
+          "key": "means",
+          "label": "Что значит"
+        },
+        {
+          "key": "do",
+          "label": "Что делать"
+        }
+      ]
+    },
+    {
+      "id": "loadout",
+      "file": "loadout.json",
+      "title": "Что носить с собой",
+      "icon": "🎒",
+      "short": "Стартовый набор и аптечка",
+      "fields": [
+        {
+          "key": "items",
+          "label": "Отмечай, что уже есть",
+          "type": "checklist"
+        },
+        {
+          "key": "why",
+          "label": "Зачем"
+        }
+      ]
+    },
+    {
+      "id": "week",
+      "file": "week.json",
+      "title": "Первая неделя",
+      "icon": "📅",
+      "short": "План прогресса по дням",
+      "fields": [
+        {
+          "key": "steps",
+          "label": "Чек-лист",
+          "type": "checklist"
+        }
+      ]
+    },
+    {
       "id": "food",
       "file": "food.json",
       "title": "Еда и вода",
@@ -186,11 +257,42 @@
         },
         {
           "key": "where",
-          "label": "Где чаще встречается"
+          "label": "Где найти (официальные данные)"
+        },
+        {
+          "key": "ammo_where",
+          "label": "Где патроны"
         },
         {
           "key": "tip",
           "label": "Совет новичку"
+        }
+      ]
+    },
+    {
+      "id": "loot",
+      "file": "loot.json",
+      "title": "Где найти",
+      "icon": "🔎",
+      "short": "Предметы и патроны: где лежат и как часто",
+      "fields": [
+        {
+          "key": "where",
+          "label": "Где найти (официальные данные)"
+        }
+      ]
+    },
+    {
+      "id": "players",
+      "file": "players.json",
+      "title": "Как не умереть от игроков",
+      "icon": "🤝",
+      "short": "KOS, руки вверх, как уйти",
+      "fields": [
+        {
+          "key": "tips",
+          "label": "Советы",
+          "type": "list"
         }
       ]
     },
@@ -212,5 +314,5 @@
       ]
     }
   ],
-  "sources": "dayz.wiki.gg, официальные патчноуты Bohemia Interactive; карта — официальные данные DayZ Central Economy (github.com/BohemiaInteractive)"
+  "sources": "dayz.wiki.gg, официальные патчноуты Bohemia Interactive; карта и «где найти» — официальные данные DayZ Central Economy (github.com/BohemiaInteractive)"
 }

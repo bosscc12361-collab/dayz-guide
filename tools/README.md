@@ -24,3 +24,6 @@
 
 Если в `data/map.json` есть поле `"background": {"src": "img/map/chernarus.jpg", "x0": 0, "z0": 0, "x1": 15360, "z1": 15360, "opacity": 1}`,
 карта рисует эту картинку вместо схемы суши. Координаты — какую часть мира (в метрах) покрывает картинка.
+
+## «Где найти» (оружие и раздел `loot`)
+`python3 tools/gen_where.py путь/к/types.xml` — берёт официальный `db/types.xml` (Чернарусь) и пишет поля `where`, `ammo_where`, `spawn` в `data/weapons.json` и весь `data/loot.json`. Список предметов и соответствие карточек классам игры — в начале скрипта (`WEAPONS`, `LOOT`, `AMMO`).

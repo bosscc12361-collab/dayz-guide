@@ -1,0 +1,1449 @@
+[
+  {
+    "id": "bandage",
+    "title": "Бинт",
+    "title_en": "Bandage",
+    "tags": [
+      "где найти",
+      "медицина"
+    ],
+    "summary": "Останавливает кровотечение и не заносит инфекцию. Держи 2–3 штуки.",
+    "where": "Больницы и медпункты. Зоны: по всей карте. Встречается часто (на карте до 40 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 40,
+      "usage": [
+        "Medic"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "BandageDressing"
+      ]
+    },
+    "see": "#injuries/bleeding"
+  },
+  {
+    "id": "disinfectant",
+    "title": "Дезинфицирующий спрей",
+    "title_en": "Disinfectant Spray",
+    "tags": [
+      "где найти",
+      "медицина",
+      "дезинфекция"
+    ],
+    "summary": "Дезинфицирует тряпки, ножи и раны.",
+    "where": "Больницы и медпункты, дома в городах, дома в деревнях. Зоны: по всей карте. Встречается обычно (на карте до 30 шт.).",
+    "spawn": {
+      "rarity": "обычно",
+      "nominal": 30,
+      "usage": [
+        "Medic",
+        "Town",
+        "Village"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "DisinfectantSpray"
+      ]
+    },
+    "see": "#injuries/disinfect"
+  },
+  {
+    "id": "alcohol-tincture",
+    "title": "Спиртовая настойка",
+    "title_en": "Alcohol Tincture",
+    "tags": [
+      "где найти",
+      "медицина",
+      "дезинфекция"
+    ],
+    "summary": "То же, что спрей: дезинфекция ран и тряпок.",
+    "where": "Дома в городах, дома в деревнях. Зоны: по всей карте. Встречается часто (на карте до 80 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 80,
+      "usage": [
+        "Town",
+        "Village"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "DisinfectantAlcohol"
+      ]
+    },
+    "see": "#injuries/disinfect"
+  },
+  {
+    "id": "iodine",
+    "title": "Йодная настойка",
+    "title_en": "Iodine Tincture",
+    "tags": [
+      "где найти",
+      "медицина",
+      "дезинфекция",
+      "вода"
+    ],
+    "summary": "Дезинфекция ран и очистка воды.",
+    "where": "Больницы и медпункты, дома в городах, дома в деревнях. Зоны: по всей карте. Встречается часто (на карте до 40 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 40,
+      "usage": [
+        "Medic",
+        "Town",
+        "Village"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "IodineTincture"
+      ]
+    },
+    "see": "#injuries/disinfect"
+  },
+  {
+    "id": "tetracycline",
+    "title": "Тетрациклин",
+    "title_en": "Tetracycline Pills",
+    "tags": [
+      "где найти",
+      "медицина",
+      "таблетки",
+      "антибиотик"
+    ],
+    "summary": "Лечит грипп, пневмонию, холеру и инфекцию раны.",
+    "where": "Больницы и медпункты. Зоны: по всей карте. Встречается обычно (на карте до 20 шт.).",
+    "spawn": {
+      "rarity": "обычно",
+      "nominal": 20,
+      "usage": [
+        "Medic"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "TetracyclineAntibiotics"
+      ]
+    },
+    "see": "#diseases/pneumonia"
+  },
+  {
+    "id": "charcoal",
+    "title": "Активированный уголь",
+    "title_en": "Charcoal Tablets",
+    "tags": [
+      "где найти",
+      "медицина",
+      "таблетки"
+    ],
+    "summary": "Лечит отравление и сальмонеллёз.",
+    "where": "Больницы и медпункты. Зоны: по всей карте. Встречается обычно (на карте до 20 шт.).",
+    "spawn": {
+      "rarity": "обычно",
+      "nominal": 20,
+      "usage": [
+        "Medic"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "CharcoalTablets"
+      ]
+    },
+    "see": "#diseases/food-poisoning"
+  },
+  {
+    "id": "vitamins",
+    "title": "Мультивитамины",
+    "title_en": "Multivitamin Pills",
+    "tags": [
+      "где найти",
+      "медицина",
+      "таблетки",
+      "иммунитет"
+    ],
+    "summary": "Поднимают иммунитет, помогают от простуды.",
+    "where": "Дома в городах, дома в деревнях. Зоны: по всей карте. Встречается часто (на карте до 40 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 40,
+      "usage": [
+        "Town",
+        "Village"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "VitaminBottle"
+      ]
+    },
+    "see": "#diseases/common-cold"
+  },
+  {
+    "id": "painkillers",
+    "title": "Обезболивающее",
+    "title_en": "Painkillers",
+    "tags": [
+      "где найти",
+      "медицина",
+      "таблетки",
+      "перелом"
+    ],
+    "summary": "Снимают боль, например при переломе.",
+    "where": "Больницы и медпункты. Зоны: по всей карте. Встречается обычно (на карте до 20 шт.).",
+    "spawn": {
+      "rarity": "обычно",
+      "nominal": 20,
+      "usage": [
+        "Medic"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "PainkillerTablets"
+      ]
+    },
+    "see": "#injuries/fracture"
+  },
+  {
+    "id": "chlorine",
+    "title": "Таблетки хлора",
+    "title_en": "Chlorine Tablets",
+    "tags": [
+      "где найти",
+      "вода",
+      "очистка"
+    ],
+    "summary": "Очищают воду во фляге или бутылке.",
+    "where": "Больницы и медпункты, охотничьи вышки и домики. Зоны: по всей карте. Встречается часто (на карте до 50 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 50,
+      "usage": [
+        "Medic",
+        "Hunting"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "PurificationTablets"
+      ]
+    },
+    "see": "#food/purify-water"
+  },
+  {
+    "id": "saline",
+    "title": "Физраствор",
+    "title_en": "Saline Bag",
+    "tags": [
+      "где найти",
+      "медицина",
+      "кровь"
+    ],
+    "summary": "Быстро восстанавливает кровь (+500).",
+    "where": "Больницы и медпункты. Зоны: по всей карте. Встречается обычно (на карте до 25 шт.).",
+    "spawn": {
+      "rarity": "обычно",
+      "nominal": 25,
+      "usage": [
+        "Medic"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "SalineBag",
+        "SalineBagIV"
+      ]
+    },
+    "see": "#injuries/blood"
+  },
+  {
+    "id": "blood-kit",
+    "title": "Набор для переливания",
+    "title_en": "Blood Bag Kit",
+    "tags": [
+      "где найти",
+      "медицина",
+      "кровь"
+    ],
+    "summary": "Нужен для переливания крови. Сначала узнай группу.",
+    "where": "Больницы и медпункты. Зоны: по всей карте. Встречается обычно (на карте до 30 шт.).",
+    "spawn": {
+      "rarity": "обычно",
+      "nominal": 30,
+      "usage": [
+        "Medic"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "BloodBagEmpty",
+        "BloodBagIV",
+        "BloodTestKit"
+      ]
+    },
+    "see": "#injuries/transfusion"
+  },
+  {
+    "id": "epinephrine",
+    "title": "Адреналин",
+    "title_en": "Epinephrine",
+    "tags": [
+      "где найти",
+      "медицина",
+      "шок"
+    ],
+    "summary": "Восстанавливает выносливость и поднимает из шока.",
+    "where": "Больницы и медпункты. Зоны: по всей карте. Встречается обычно (на карте до 30 шт.).",
+    "spawn": {
+      "rarity": "обычно",
+      "nominal": 30,
+      "usage": [
+        "Medic"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "Epinephrine"
+      ]
+    },
+    "see": "#injuries/shock"
+  },
+  {
+    "id": "morphine",
+    "title": "Морфин",
+    "title_en": "Morphine",
+    "tags": [
+      "где найти",
+      "медицина",
+      "перелом"
+    ],
+    "summary": "Сильное обезболивающее, лечит боль при переломе.",
+    "where": "Больницы и медпункты. Зоны: по всей карте. Встречается обычно (на карте до 15 шт.).",
+    "spawn": {
+      "rarity": "обычно",
+      "nominal": 15,
+      "usage": [
+        "Medic"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "Morphine"
+      ]
+    },
+    "see": "#injuries/fracture"
+  },
+  {
+    "id": "sewing-kit",
+    "title": "Швейный набор",
+    "title_en": "Sewing Kit",
+    "tags": [
+      "где найти",
+      "медицина",
+      "ремонт"
+    ],
+    "summary": "Зашивает раны и чинит одежду.",
+    "where": "Дома в городах, дома в деревнях. Зоны: по всей карте. Встречается часто (на карте до 100 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 100,
+      "usage": [
+        "Town",
+        "Village"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "SewingKit"
+      ]
+    }
+  },
+  {
+    "id": "pox",
+    "title": "Антидот PO-X",
+    "title_en": "PO-X Antidote",
+    "tags": [
+      "где найти",
+      "медицина",
+      "газ"
+    ],
+    "summary": "Лечит отравление газом.",
+    "where": "Только токсичные зоны (нужен противогаз и ОЗК). Встречается очень редко (на карте до 1 шт.).",
+    "spawn": {
+      "rarity": "очень редко",
+      "nominal": 1,
+      "usage": [
+        "ContaminatedArea"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "AntiChemInjector"
+      ]
+    },
+    "see": "#diseases/gas-poisoning"
+  },
+  {
+    "id": "first-aid",
+    "title": "Аптечка",
+    "title_en": "First Aid Kit",
+    "tags": [
+      "где найти",
+      "медицина",
+      "контейнер"
+    ],
+    "summary": "Маленький контейнер для лекарств.",
+    "where": "Больницы и медпункты. Зоны: по всей карте. Встречается обычно (на карте до 15 шт.).",
+    "spawn": {
+      "rarity": "обычно",
+      "nominal": 15,
+      "usage": [
+        "Medic"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "FirstAidKit"
+      ]
+    }
+  },
+  {
+    "id": "canteen",
+    "title": "Фляга",
+    "title_en": "Canteen",
+    "tags": [
+      "где найти",
+      "вода",
+      "ёмкость"
+    ],
+    "summary": "Главная ёмкость для воды. Найденную флягу сначала вылей.",
+    "where": "Военные объекты (базы, блокпосты, палатки), охотничьи вышки и домики. Зоны: по всей карте. Встречается обычно (на карте до 20 шт.).",
+    "spawn": {
+      "rarity": "обычно",
+      "nominal": 20,
+      "usage": [
+        "Military",
+        "Hunting"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "Canteen"
+      ]
+    },
+    "see": "#food/found-bottles"
+  },
+  {
+    "id": "water-bottle",
+    "title": "Бутылка воды",
+    "title_en": "Water Bottle",
+    "tags": [
+      "где найти",
+      "вода",
+      "ёмкость"
+    ],
+    "summary": "Лёгкая ёмкость на 1 литр.",
+    "where": "Почти в любых зданиях (на полках, столах). Зоны: по всей карте. Встречается часто (на карте до 100 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 100,
+      "usage": [],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "WaterBottle"
+      ]
+    },
+    "see": "#food/found-bottles"
+  },
+  {
+    "id": "can-opener",
+    "title": "Консервный нож",
+    "title_en": "Can Opener",
+    "tags": [
+      "где найти",
+      "еда",
+      "инструмент"
+    ],
+    "summary": "Открывает банку без потерь. Ножом можно, но часть еды теряется.",
+    "where": "Дома в городах, дома в деревнях. Зоны: по всей карте. Встречается часто (на карте до 70 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 70,
+      "usage": [
+        "Town",
+        "Village"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "CanOpener"
+      ]
+    },
+    "see": "#food/canned-food"
+  },
+  {
+    "id": "beans",
+    "title": "Печёная фасоль",
+    "title_en": "Baked Beans",
+    "tags": [
+      "где найти",
+      "еда",
+      "консервы"
+    ],
+    "summary": "Сытная и частая консерва.",
+    "where": "Дома в городах, дома в деревнях. Зоны: тир 1–3 (побережье, средняя полоса, север и запад). Встречается обычно (на карте до 15 шт.).",
+    "spawn": {
+      "rarity": "обычно",
+      "nominal": 15,
+      "usage": [
+        "Town",
+        "Village"
+      ],
+      "tier": [
+        "Tier1",
+        "Tier2",
+        "Tier3"
+      ],
+      "deloot": false,
+      "classes": [
+        "BakedBeansCan"
+      ]
+    },
+    "see": "#food/canned-food"
+  },
+  {
+    "id": "tactical-bacon",
+    "title": "Тактический бекон",
+    "title_en": "Tactical Bacon",
+    "tags": [
+      "где найти",
+      "еда",
+      "консервы"
+    ],
+    "summary": "Одна из самых сытных консерв.",
+    "where": "Военные объекты (базы, блокпосты, палатки). Зоны: по всей карте. Встречается редко (на карте до 10 шт.).",
+    "spawn": {
+      "rarity": "редко",
+      "nominal": 10,
+      "usage": [
+        "Military"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "TacticalBaconCan"
+      ]
+    },
+    "see": "#food/canned-food"
+  },
+  {
+    "id": "pot",
+    "title": "Кастрюля",
+    "title_en": "Cooking Pot",
+    "tags": [
+      "где найти",
+      "еда",
+      "готовка",
+      "вода"
+    ],
+    "summary": "Готовка и кипячение воды.",
+    "where": "Дома в городах, дома в деревнях. Зоны: по всей карте. Встречается обычно (на карте до 20 шт.).",
+    "spawn": {
+      "rarity": "обычно",
+      "nominal": 20,
+      "usage": [
+        "Town",
+        "Village"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "Pot"
+      ]
+    },
+    "see": "#fire/cooking"
+  },
+  {
+    "id": "kitchen-knife",
+    "title": "Кухонный нож",
+    "title_en": "Kitchen Knife",
+    "tags": [
+      "где найти",
+      "инструмент",
+      "нож"
+    ],
+    "summary": "Разделка туш, крафт тряпок, открытие банок.",
+    "where": "Дома в городах. Зоны: по всей карте. Встречается часто (на карте до 60 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 60,
+      "usage": [
+        "Town"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "KitchenKnife"
+      ]
+    }
+  },
+  {
+    "id": "hunting-knife",
+    "title": "Охотничий нож",
+    "title_en": "Hunting Knife",
+    "tags": [
+      "где найти",
+      "инструмент",
+      "нож"
+    ],
+    "summary": "Прочный нож для разделки и боя.",
+    "where": "Охотничьи вышки и домики. Зоны: по всей карте. Встречается часто (на карте до 60 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 60,
+      "usage": [
+        "Hunting"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "HuntingKnife"
+      ]
+    }
+  },
+  {
+    "id": "hatchet",
+    "title": "Топорик",
+    "title_en": "Hatchet",
+    "tags": [
+      "где найти",
+      "инструмент",
+      "дрова",
+      "оружие"
+    ],
+    "summary": "Дрова, ветки, хорошее холодное оружие.",
+    "where": "Дома в деревнях, фермы и сараи. Зоны: по всей карте. Встречается часто (на карте до 120 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 120,
+      "usage": [
+        "Village",
+        "Farm"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "Hatchet"
+      ]
+    },
+    "see": "#fire/light-fire"
+  },
+  {
+    "id": "matches",
+    "title": "Спички",
+    "title_en": "Matchbox",
+    "tags": [
+      "где найти",
+      "огонь"
+    ],
+    "summary": "Розжиг костра. Боятся воды.",
+    "where": "Дома в городах, дома в деревнях, охотничьи вышки и домики. Зоны: по всей карте. Встречается часто (на карте до 60 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 60,
+      "usage": [
+        "Town",
+        "Village",
+        "Hunting"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "Matchbox"
+      ]
+    },
+    "see": "#fire/light-fire"
+  },
+  {
+    "id": "lighter",
+    "title": "Зажигалка",
+    "title_en": "Lighter",
+    "tags": [
+      "где найти",
+      "огонь"
+    ],
+    "summary": "Розжиг костра, работает много раз.",
+    "where": "Дома в городах. Зоны: по всей карте. Встречается часто (на карте до 50 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 50,
+      "usage": [
+        "Town"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "PetrolLighter"
+      ]
+    },
+    "see": "#fire/light-fire"
+  },
+  {
+    "id": "compass",
+    "title": "Компас",
+    "title_en": "Compass",
+    "tags": [
+      "где найти",
+      "навигация"
+    ],
+    "summary": "Север — и уже не заблудишься.",
+    "where": "Военные объекты (базы, блокпосты, палатки), охотничьи вышки и домики. Зоны: по всей карте. Встречается часто (на карте до 70 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 70,
+      "usage": [
+        "Military",
+        "Hunting"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "Compass"
+      ]
+    }
+  },
+  {
+    "id": "map",
+    "title": "Карта Чернаруси",
+    "title_en": "Chernarus Map",
+    "tags": [
+      "где найти",
+      "навигация"
+    ],
+    "summary": "Бумажная карта в игре.",
+    "where": "Охотничьи вышки и домики, офисы и администрации. Зоны: по всей карте. Встречается часто (на карте до 50 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 50,
+      "usage": [
+        "Hunting",
+        "Office"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "ChernarusMap"
+      ]
+    }
+  },
+  {
+    "id": "binoculars",
+    "title": "Бинокль",
+    "title_en": "Binoculars",
+    "tags": [
+      "где найти",
+      "навигация",
+      "разведка"
+    ],
+    "summary": "Сначала посмотри, потом иди.",
+    "where": "Военные объекты (базы, блокпосты, палатки), полицейские участки, охотничьи вышки и домики. Зоны: по всей карте. Встречается часто (на карте до 50 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 50,
+      "usage": [
+        "Military",
+        "Police",
+        "Hunting"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "Binoculars"
+      ]
+    }
+  },
+  {
+    "id": "flashlight",
+    "title": "Фонарик",
+    "title_en": "Flashlight",
+    "tags": [
+      "где найти",
+      "свет"
+    ],
+    "summary": "Свет ночью. Нужна батарейка 9V.",
+    "where": "Почти в любых зданиях (на полках, столах). Зоны: по всей карте. Встречается часто (на карте до 90 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 90,
+      "usage": [],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "Flashlight"
+      ]
+    }
+  },
+  {
+    "id": "headtorch",
+    "title": "Налобный фонарь",
+    "title_en": "Headtorch",
+    "tags": [
+      "где найти",
+      "свет"
+    ],
+    "summary": "Руки остаются свободными.",
+    "where": "Дома в городах, дома в деревнях, фермы и сараи, охотничьи вышки и домики, промзоны, гаражи, заводы. Зоны: тир 2–4 (средняя полоса, север и запад, крайний северо-запад: Тисы, NWAF). Встречается часто (на карте до 240 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 240,
+      "usage": [
+        "Town",
+        "Village",
+        "Farm",
+        "Hunting",
+        "Industrial"
+      ],
+      "tier": [
+        "Tier2",
+        "Tier3",
+        "Tier4"
+      ],
+      "deloot": false,
+      "classes": [
+        "Headtorch_Black",
+        "Headtorch_Grey"
+      ]
+    }
+  },
+  {
+    "id": "battery",
+    "title": "Батарейка 9V",
+    "title_en": "9V Battery",
+    "tags": [
+      "где найти",
+      "свет",
+      "рация"
+    ],
+    "summary": "Для фонарей, рации, прицелов.",
+    "where": "Дома в деревнях, промзоны, гаражи, заводы. Зоны: по всей карте. Встречается часто (на карте до 100 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 100,
+      "usage": [
+        "Village",
+        "Industrial"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "Battery9V"
+      ]
+    }
+  },
+  {
+    "id": "duct-tape",
+    "title": "Изолента",
+    "title_en": "Duct Tape",
+    "tags": [
+      "где найти",
+      "ремонт",
+      "крафт"
+    ],
+    "summary": "Чинит снаряжение, нужна в крафте.",
+    "where": "Дома в городах, дома в деревнях, фермы и сараи, промзоны, гаражи, заводы. Зоны: по всей карте. Встречается часто (на карте до 90 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 90,
+      "usage": [
+        "Town",
+        "Village",
+        "Farm",
+        "Industrial"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "DuctTape"
+      ]
+    }
+  },
+  {
+    "id": "rope",
+    "title": "Верёвка",
+    "title_en": "Rope",
+    "tags": [
+      "где найти",
+      "крафт"
+    ],
+    "summary": "Для крафта рюкзака, лука и сооружений.",
+    "where": "Фермы и сараи, промзоны, гаражи, заводы. Зоны: по всей карте. Встречается часто (на карте до 100 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 100,
+      "usage": [
+        "Farm",
+        "Industrial"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "Rope"
+      ]
+    },
+    "see": "#crafting/rope"
+  },
+  {
+    "id": "shovel",
+    "title": "Лопата",
+    "title_en": "Shovel",
+    "tags": [
+      "где найти",
+      "инструмент",
+      "база"
+    ],
+    "summary": "Тайники, огород, база.",
+    "where": "Военные объекты (базы, блокпосты, палатки), фермы и сараи, промзоны, гаражи, заводы. Зоны: по всей карте. Встречается часто (на карте до 105 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 105,
+      "usage": [
+        "Military",
+        "Farm",
+        "Industrial"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "Shovel",
+        "FieldShovel"
+      ]
+    }
+  },
+  {
+    "id": "gas-mask",
+    "title": "Противогаз",
+    "title_en": "Gas Mask",
+    "tags": [
+      "где найти",
+      "газ",
+      "защита"
+    ],
+    "summary": "Без фильтра и ОЗК в газе всё равно опасно.",
+    "where": "Военные объекты (базы, блокпосты, палатки), больницы и медпункты, пожарные части; также на динамических событиях (крушения вертолётов, конвои). Зоны: по всей карте. Встречается обычно (на карте до 30 шт.).",
+    "spawn": {
+      "rarity": "обычно",
+      "nominal": 30,
+      "usage": [
+        "Military",
+        "Medic",
+        "Firefighter"
+      ],
+      "tier": [],
+      "deloot": true,
+      "classes": [
+        "GasMask",
+        "GP5GasMask",
+        "AirborneMask"
+      ]
+    },
+    "see": "#diseases/gas-poisoning"
+  },
+  {
+    "id": "taloon",
+    "title": "Рюкзак Taloon",
+    "title_en": "Taloon Backpack",
+    "tags": [
+      "где найти",
+      "рюкзак",
+      "одежда"
+    ],
+    "summary": "Частый средний рюкзак.",
+    "where": "Дома в деревнях. Зоны: тир 2–4 (средняя полоса, север и запад, крайний северо-запад: Тисы, NWAF). Встречается часто (на карте до 68 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 68,
+      "usage": [
+        "Village"
+      ],
+      "tier": [
+        "Tier2",
+        "Tier3",
+        "Tier4"
+      ],
+      "deloot": false,
+      "classes": [
+        "TaloonBag_Blue",
+        "TaloonBag_Green",
+        "TaloonBag_Orange",
+        "TaloonBag_Violet"
+      ]
+    }
+  },
+  {
+    "id": "hunting-bag",
+    "title": "Охотничий рюкзак",
+    "title_en": "Hunting Backpack",
+    "tags": [
+      "где найти",
+      "рюкзак",
+      "одежда"
+    ],
+    "summary": "Большой рюкзак охотника.",
+    "where": "Охотничьи вышки и домики. Зоны: тир 2–4 (средняя полоса, север и запад, крайний северо-запад: Тисы, NWAF). Встречается редко (на карте до 12 шт.).",
+    "spawn": {
+      "rarity": "редко",
+      "nominal": 12,
+      "usage": [
+        "Hunting"
+      ],
+      "tier": [
+        "Tier2",
+        "Tier3",
+        "Tier4"
+      ],
+      "deloot": false,
+      "classes": [
+        "HuntingBag"
+      ]
+    }
+  },
+  {
+    "id": "raincoat",
+    "title": "Дождевик",
+    "title_en": "Raincoat",
+    "tags": [
+      "где найти",
+      "одежда",
+      "дождь"
+    ],
+    "summary": "Не даёт промокнуть.",
+    "where": "Дома в городах, дома в деревнях, побережье. Зоны: по всей карте. Встречается часто (на карте до 205 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 205,
+      "usage": [
+        "Town",
+        "Village",
+        "Coast"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "Raincoat_Orange",
+        "Raincoat_Green",
+        "Raincoat_Yellow",
+        "Raincoat_Pink",
+        "Raincoat_Red",
+        "Raincoat_Blue",
+        "Raincoat_Black"
+      ]
+    },
+    "see": "#fire/wet-clothes"
+  },
+  {
+    "id": "gloves",
+    "title": "Перчатки",
+    "title_en": "Work Gloves",
+    "tags": [
+      "где найти",
+      "одежда",
+      "руки"
+    ],
+    "summary": "Руки не пачкаются кровью — меньше болезней.",
+    "where": "Фермы и сараи, промзоны, гаражи, заводы. Зоны: по всей карте. Встречается часто (на карте до 53 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 53,
+      "usage": [
+        "Farm",
+        "Industrial"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "WorkingGloves_Yellow",
+        "WorkingGloves_Black",
+        "WorkingGloves_Beige",
+        "WorkingGloves_Brown"
+      ]
+    },
+    "see": "#food/bloody-hands"
+  },
+  {
+    "id": "ammo-9x19",
+    "title": "Патроны 9x19",
+    "title_en": "Ammo 9x19",
+    "tags": [
+      "где найти",
+      "патроны",
+      "9x19"
+    ],
+    "summary": "Россыпью и в коробках. Оружие под этот калибр — в разделе «Оружие и патроны».",
+    "where": "Военные объекты (базы, блокпосты, палатки), полицейские участки, дома в городах, дома в деревнях. Зоны: по всей карте. Встречается часто (на карте до 130 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 130,
+      "usage": [
+        "Military",
+        "Police",
+        "Town",
+        "Village"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "Ammo_9x19",
+        "AmmoBox_9x19_25rnd"
+      ]
+    },
+    "see": "#weapons?f=9x19"
+  },
+  {
+    "id": "ammo-45acp",
+    "title": "Патроны .45 ACP",
+    "title_en": "Ammo .45 ACP",
+    "tags": [
+      "где найти",
+      "патроны",
+      ".45 ACP"
+    ],
+    "summary": "Россыпью и в коробках. Оружие под этот калибр — в разделе «Оружие и патроны».",
+    "where": "Военные объекты (базы, блокпосты, палатки). Зоны: по всей карте. Встречается часто (на карте до 95 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 95,
+      "usage": [
+        "Military"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "Ammo_45ACP",
+        "AmmoBox_45ACP_25rnd"
+      ]
+    },
+    "see": "#weapons?f=.45 ACP"
+  },
+  {
+    "id": "ammo-380acp",
+    "title": "Патроны .380 ACP",
+    "title_en": "Ammo .380 ACP",
+    "tags": [
+      "где найти",
+      "патроны",
+      ".380 ACP"
+    ],
+    "summary": "Россыпью и в коробках. Оружие под этот калибр — в разделе «Оружие и патроны».",
+    "where": "Полицейские участки, дома в городах, дома в деревнях. Зоны: по всей карте. Встречается часто (на карте до 120 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 120,
+      "usage": [
+        "Police",
+        "Town",
+        "Village"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "Ammo_380",
+        "AmmoBox_380_35rnd"
+      ]
+    },
+    "see": "#weapons?f=.380 ACP"
+  },
+  {
+    "id": "ammo-357",
+    "title": "Патроны .357",
+    "title_en": "Ammo .357",
+    "tags": [
+      "где найти",
+      "патроны",
+      ".357"
+    ],
+    "summary": "Россыпью и в коробках. Оружие под этот калибр — в разделе «Оружие и патроны».",
+    "where": "Дома в городах, дома в деревнях, фермы и сараи. Зоны: по всей карте. Встречается часто (на карте до 120 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 120,
+      "usage": [
+        "Town",
+        "Village",
+        "Farm"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "Ammo_357",
+        "AmmoBox_357_20Rnd"
+      ]
+    },
+    "see": "#weapons?f=.357"
+  },
+  {
+    "id": "ammo-22lr",
+    "title": "Патроны .22 LR",
+    "title_en": "Ammo .22 LR",
+    "tags": [
+      "где найти",
+      "патроны",
+      ".22 LR"
+    ],
+    "summary": "Россыпью и в коробках. Оружие под этот калибр — в разделе «Оружие и патроны».",
+    "where": "Дома в городах, дома в деревнях. Зоны: по всей карте. Встречается часто (на карте до 145 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 145,
+      "usage": [
+        "Town",
+        "Village"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "Ammo_22",
+        "AmmoBox_22_50Rnd"
+      ]
+    },
+    "see": "#weapons?f=.22 LR"
+  },
+  {
+    "id": "ammo-12калибр",
+    "title": "Патроны 12 калибр",
+    "title_en": "Ammo 12 калибр",
+    "tags": [
+      "где найти",
+      "патроны",
+      "12 калибр"
+    ],
+    "summary": "Россыпью и в коробках. Оружие под этот калибр — в разделе «Оружие и патроны».",
+    "where": "Полицейские участки, дома в городах, дома в деревнях, фермы и сараи, охотничьи вышки и домики. Зоны: по всей карте. Встречается часто (на карте до 240 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 240,
+      "usage": [
+        "Police",
+        "Town",
+        "Village",
+        "Farm",
+        "Hunting"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "Ammo_12gaPellets",
+        "Ammo_12gaSlug",
+        "AmmoBox_00buck_10rnd",
+        "AmmoBox_12gaSlug_10Rnd"
+      ]
+    },
+    "see": "#weapons?f=12 калибр"
+  },
+  {
+    "id": "ammo-762x39",
+    "title": "Патроны 7.62x39",
+    "title_en": "Ammo 7.62x39",
+    "tags": [
+      "где найти",
+      "патроны",
+      "7.62x39"
+    ],
+    "summary": "Россыпью и в коробках. Оружие под этот калибр — в разделе «Оружие и патроны».",
+    "where": "Военные объекты (базы, блокпосты, палатки), дома в деревнях, фермы и сараи, охотничьи вышки и домики. Зоны: по всей карте. Встречается часто (на карте до 118 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 118,
+      "usage": [
+        "Military",
+        "Village",
+        "Farm",
+        "Hunting"
+      ],
+      "tier": [
+        "Tier1",
+        "Tier2",
+        "Tier3",
+        "Tier4"
+      ],
+      "deloot": false,
+      "classes": [
+        "Ammo_762x39",
+        "AmmoBox_762x39_20Rnd"
+      ]
+    },
+    "see": "#weapons?f=7.62x39"
+  },
+  {
+    "id": "ammo-762x54r",
+    "title": "Патроны 7.62x54R",
+    "title_en": "Ammo 7.62x54R",
+    "tags": [
+      "где найти",
+      "патроны",
+      "7.62x54R"
+    ],
+    "summary": "Россыпью и в коробках. Оружие под этот калибр — в разделе «Оружие и патроны».",
+    "where": "Военные объекты (базы, блокпосты, палатки), дома в городах, дома в деревнях, фермы и сараи, охотничьи вышки и домики. Зоны: тир 2–4 (средняя полоса, север и запад, крайний северо-запад: Тисы, NWAF). Встречается часто (на карте до 75 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 75,
+      "usage": [
+        "Military",
+        "Town",
+        "Village",
+        "Farm",
+        "Hunting"
+      ],
+      "tier": [
+        "Tier2",
+        "Tier3",
+        "Tier4"
+      ],
+      "deloot": false,
+      "classes": [
+        "Ammo_762x54",
+        "AmmoBox_762x54_20Rnd"
+      ]
+    },
+    "see": "#weapons?f=7.62x54R"
+  },
+  {
+    "id": "ammo-308win",
+    "title": "Патроны .308 Win",
+    "title_en": "Ammo .308 Win",
+    "tags": [
+      "где найти",
+      "патроны",
+      ".308 Win"
+    ],
+    "summary": "Россыпью и в коробках. Оружие под этот калибр — в разделе «Оружие и патроны».",
+    "where": "Фермы и сараи, охотничьи вышки и домики. Зоны: по всей карте. Встречается часто (на карте до 70 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 70,
+      "usage": [
+        "Farm",
+        "Hunting"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "Ammo_308Win",
+        "AmmoBox_308Win_20Rnd"
+      ]
+    },
+    "see": "#weapons?f=.308 Win"
+  },
+  {
+    "id": "ammo-556x45",
+    "title": "Патроны 5.56x45",
+    "title_en": "Ammo 5.56x45",
+    "tags": [
+      "где найти",
+      "патроны",
+      "5.56x45"
+    ],
+    "summary": "Россыпью и в коробках. Оружие под этот калибр — в разделе «Оружие и патроны».",
+    "where": "Военные объекты (базы, блокпосты, палатки). Зоны: тир 2–4 (средняя полоса, север и запад, крайний северо-запад: Тисы, NWAF). Встречается часто (на карте до 70 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 70,
+      "usage": [
+        "Military"
+      ],
+      "tier": [
+        "Tier2",
+        "Tier3",
+        "Tier4"
+      ],
+      "deloot": false,
+      "classes": [
+        "Ammo_556x45",
+        "AmmoBox_556x45_20Rnd"
+      ]
+    },
+    "see": "#weapons?f=5.56x45"
+  },
+  {
+    "id": "ammo-545x39",
+    "title": "Патроны 5.45x39",
+    "title_en": "Ammo 5.45x39",
+    "tags": [
+      "где найти",
+      "патроны",
+      "5.45x39"
+    ],
+    "summary": "Россыпью и в коробках. Оружие под этот калибр — в разделе «Оружие и патроны».",
+    "where": "Военные объекты (базы, блокпосты, палатки). Зоны: по всей карте. Встречается часто (на карте до 42 шт.).",
+    "spawn": {
+      "rarity": "часто",
+      "nominal": 42,
+      "usage": [
+        "Military"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "Ammo_545x39",
+        "AmmoBox_545x39_20Rnd"
+      ]
+    },
+    "see": "#weapons?f=5.45x39"
+  },
+  {
+    "id": "ammo-9x39",
+    "title": "Патроны 9x39",
+    "title_en": "Ammo 9x39",
+    "tags": [
+      "где найти",
+      "патроны",
+      "9x39"
+    ],
+    "summary": "Россыпью и в коробках. Оружие под этот калибр — в разделе «Оружие и патроны».",
+    "where": "Военные объекты (базы, блокпосты, палатки). Зоны: по всей карте. Встречается обычно (на карте до 29 шт.).",
+    "spawn": {
+      "rarity": "обычно",
+      "nominal": 29,
+      "usage": [
+        "Military"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "Ammo_9x39",
+        "AmmoBox_9x39_20Rnd"
+      ]
+    },
+    "see": "#weapons?f=9x39"
+  },
+  {
+    "id": "ammo-болты",
+    "title": "Болты для арбалета",
+    "title_en": "Ammo Болты",
+    "tags": [
+      "где найти",
+      "патроны",
+      "Болты"
+    ],
+    "summary": "Россыпью и в коробках. Оружие под этот калибр — в разделе «Оружие и патроны».",
+    "where": "Охотничьи вышки и домики. Зоны: по всей карте. Встречается обычно (на карте до 25 шт.).",
+    "spawn": {
+      "rarity": "обычно",
+      "nominal": 25,
+      "usage": [
+        "Hunting"
+      ],
+      "tier": [],
+      "deloot": false,
+      "classes": [
+        "Ammo_HuntingBolt"
+      ]
+    },
+    "see": "#weapons?f=Болты"
+  }
+]

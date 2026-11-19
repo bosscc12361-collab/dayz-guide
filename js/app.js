@@ -160,7 +160,7 @@
     for (const f of sec.fields || []) {
       const v = it[f.key];
       if (v == null) continue;
-      if (Array.isArray(v)) parts.push(v.map((x) => (typeof x === 'object' ? x.text : x)).join(' '));
+      if (Array.isArray(v)) parts.push(v.map((x) => (Array.isArray(x) ? x.join(' ') : typeof x === 'object' ? x.text : x)).join(' '));
       else parts.push(String(v));
     }
     if (it.result_en) parts.push(it.result_en);
@@ -305,6 +305,7 @@
     if (v == null || v === '' || (Array.isArray(v) && !v.length)) return '';
     let val;
     if (f.type === 'checklist') val = checklistHTML(sec, it, v);
+    else if (f.type === 'keys') val = '<div class="keys">' + v.map((k) => '<div class="key-row"><span class="kbd">' + esc(k[0]) + '</span><span class="key-act">' + md(k[1]).replace(/^<p>|<\/p>$/g, '') + '</span></div>').join('') + '</div>';
     else if (f.type === 'safety') {
       const map = { yes: ['ok', 'Да, безопасно'], no: ['bad', 'Нет, опасно'], caution: ['warn', 'С осторожностью'] };
       const m = map[v] || ['', String(v)];
@@ -327,6 +328,18 @@
       '<div class="progress-label" data-progress>Выполнено: ' + done.size + ' из ' + steps.length + '</div>' +
       '<ul class="checklist" data-checklist="' + esc(key) + '" data-total="' + steps.length + '">' + lis + '</ul>' +
       '<button class="reset" data-reset="' + esc(key) + '">Сбросить галочки</button>';
+  }
+
+  function seeTitle(h) {
+    const [path] = h.slice(1).split('?');
+    const [sid, iid] = path.split('/');
+    if (sid === 'help') return 'Что со мной?';
+    if (sid === 'map' && !iid) return 'Карта Чернаруси';
+    const s = state.byId[sid];
+    if (!s) return 'Подробнее';
+    if (!iid) return s.title + (h.includes('?f=') ? ': ' + decodeURIComponent(h.split('?f=')[1]) : '');
+    const it = s.items.find((x) => x.id === iid);
+    return it ? it.title : s.title;
   }
 
   function viewDetail(sec, it) {
@@ -353,6 +366,10 @@
     for (const f of sec.fields || []) html += fieldHTML(sec, it, f);
     if (it.text) html += '<div class="field"><div class="f-label">Подробнее</div><div class="f-val">' + md(it.text) + '</div></div>';
     html += '</div>';
+    if (it.see && /^#[\w\-\/?=.%а-яё ]+$/i.test(it.see)) {
+      const t = seeTitle(it.see);
+      html += '<a class="btn see" href="' + esc(it.see) + '">→ ' + esc(t) + '</a>';
+    }
     html += '<div class="d-actions">' +
       '<button class="btn' + (on ? ' on' : '') + '" data-fav="' + esc(k) + '">' + '<span class="lbl">' + (on ? 'В избранном' : 'В избранное') + '</span></button>' +
       '<button class="btn" data-share>' + ICONS.share + 'Поделиться</button></div>';

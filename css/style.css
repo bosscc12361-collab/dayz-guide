@@ -536,3 +536,11 @@ mark { background: rgba(47,123,255,.35); color: inherit; border-radius: 3px; pad
 .pg-list li.star-item { color: var(--text); }
 .pg-list a { text-decoration: none; font-weight: 700; }
 .patch-builds { color: var(--text-3); font-size: 12px; margin-top: 12px; }
+
+/* клавиши управления */
+.keys { display: grid; gap: 8px; }
+.key-row { display: flex; align-items: flex-start; gap: 12px; }
+.kbd { flex: 0 0 auto; max-width: 46%; padding: 4px 9px; border-radius: 8px; background: #13213d; border: 1px solid #2a4170; border-bottom-width: 3px; color: var(--bolt-light); font-weight: 700; font-size: 15px; line-height: 1.3; }
+.key-act { flex: 1; padding-top: 3px; }
+/* ссылка на связанную карточку */
+.btn.see { display: flex; width: 100%; box-sizing: border-box; text-align: center; margin: 14px 0 0; text-decoration: none; color: var(--bolt-light); }
