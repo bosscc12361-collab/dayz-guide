@@ -159,7 +159,7 @@
   function toggleFav(secId, id) {
     const k = favKey(secId, id);
     if (state.favs.has(k)) { state.favs.delete(k); toast('Убрано из избранного'); }
-    else { state.favs.add(k); toast('Добавлено в избранное ⭐'); }
+    else { state.favs.add(k); toast('Добавлено в избранное ⭐'); trackEvent('favorite-add', { card: k }); }
     store.set(FAV_KEY, [...state.favs]);
     document.querySelectorAll('[data-fav="' + CSS.escape(k) + '"]').forEach((b) => {
       const on = state.favs.has(k);
@@ -455,6 +455,7 @@
       '<h3>Автор</h3><p>' + esc(m.author || '') + (m.author_tagline ? ': ' + esc(m.author_tagline) : '') + '</p>' + socialsHTML(true) +
       '<h3>Названия предметов</h3><p>Русские названия даны по русской версии игры, в скобках английские. Если в твоей версии перевод отличается, ищи по английскому названию.</p>' +
       (m.sources ? '<h3>Источники</h3><p>' + esc(m.sources) + '</p>' : '') +
+      '<h3>Статистика</h3><p>Сайт считает анонимную статистику посещений (Umami): без cookie и без личных данных. Нужна, чтобы понимать, какие разделы полезны.</p>' +
       '<h3>Дисклеймер</h3>' +
       '<p>Неофициальный фанатский справочник. DayZ — торговая марка Bohemia Interactive. Игра часто обновляется, поэтому сверяйтесь с патчноутами.</p>' +
       '</div>' + footer();
@@ -504,7 +505,33 @@
     state.lastHash = location.hash || '#';
     const y = parts.length === 2 ? 0 : (state.scroll[state.lastHash] || 0);
     window.scrollTo(0, y);
+    trackView('/' + parts.join('/'));
   }
+
+  // ---------- статистика (Umami, без cookie) ----------
+  // Каждая карточка считается отдельной страницей: /diseases/cholera, /weapons/mosin и т.д.
+  let pendingView = null;
+  function trackView(url) {
+    pendingView = url;
+    try {
+      if (window.umami && typeof window.umami.track === 'function') {
+        window.umami.track((p) => ({ ...p, url, title: document.title }));
+        pendingView = null;
+      }
+    } catch (e) { /* статистика не должна ломать приложение */ }
+  }
+  function trackEvent(name, data) {
+    try { if (window.umami && window.umami.track) window.umami.track(name, data); } catch (e) { /* ignore */ }
+  }
+  const umamiTag = document.getElementById('umami');
+  if (umamiTag) umamiTag.addEventListener('load', () => { if (pendingView) trackView(pendingView); });
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a.social, a.btn.wiki, [data-share]');
+    if (!a) return;
+    if (a.classList.contains('social')) trackEvent('social-click', { network: a.textContent.trim().split(/\s/)[0] });
+    else if (a.classList.contains('wiki')) trackEvent('wiki-click', { card: location.hash.slice(1) });
+    else trackEvent('share-click', { card: location.hash.slice(1) });
+  });
 
   // глобальные клики: звёздочки
   document.addEventListener('click', (e) => {
