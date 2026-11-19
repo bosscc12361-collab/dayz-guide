@@ -1,10 +1,10 @@
 /* Service worker: офлайн-режим.
    Меняешь код (html/css/js)? Увеличь VERSION на 1, чтобы телефоны подхватили обновление.
    Данные из /data обновляются сами: сначала показывается сохранённая копия, а свежая скачивается в фоне. */
-const VERSION = 'v8';
+const VERSION = 'v9';
 const CACHE = 'dayz-guide-' + VERSION;
 const SHELL = [
-  './', 'index.html', 'css/style.css', 'js/app.js', 'js/map.js', 'data/map.json', 'manifest.json',
+  './', 'index.html', 'css/style.css', 'js/app.js', 'js/map.js', 'data/map.json', 'data/map-buildings.json', 'manifest.json',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'fonts/russo-cyr.woff2', 'fonts/russo-lat.woff2',
   'data/meta.json', 'data/first15.json', 'data/food.json', 'data/diseases.json',
   'data/injuries.json', 'data/crafting.json', 'data/fire.json', 'data/infected.json',

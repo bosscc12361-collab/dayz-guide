@@ -489,18 +489,25 @@
     $view.innerHTML = '<div class="map-page">' +
       '<div class="chips map-layers">' + chips + '</div>' +
       '<div class="map-wrap"><div class="map-ctrl">' +
-        '<button data-zoom="in" aria-label="Приблизить">+</button><button data-zoom="out" aria-label="Отдалить">−</button><button data-zoom="fit" aria-label="Вся карта">⤢</button>' +
-      '</div><div class="map-sheet" hidden></div></div>' +
-      '<p class="map-hint">Двигай карту пальцем, приближай двумя пальцами или двойным тапом. Тап по значку — подробности.</p>' +
+        '<button data-zoom="in" aria-label="Приблизить">+</button><button data-zoom="out" aria-label="Отдалить">−</button>' +
+        '<button data-zoom="fit" aria-label="Вся карта">⤢</button><button data-zoom="legend" aria-label="Обозначения">?</button>' +
+      '</div><div class="map-tip" hidden></div><div class="map-legend" hidden></div><div class="map-sheet" hidden></div></div>' +
+      '<p class="map-hint">Двигай карту пальцем, приближай двумя пальцами или двойным тапом. Чем ближе — тем больше подписей. ' +
+        'На компьютере достаточно навести мышку. «?» — обозначения.</p>' +
       '<div class="h-section">✅ Хорошие маршруты для новичка</div>' + M.routes.filter((r) => r.verdict === 'good').map(card).join('') +
       '<div class="h-section">❌ Частые ошибки новичков</div>' + M.routes.filter((r) => r.verdict !== 'good').map(card).join('') +
-      '<p class="map-note">' + esc(M.note) + ' Данные проверены: ' + esc(M.checked) + '. Оценка маршрутов: по данным игры (колонки, медицина, полиция, газ и военные базы в пределах ~400 м от пути) и опыту игроков.</p>' +
+      '<p class="map-note">' + esc(M.note) + ' Здания нарисованы по точкам лута из официальных данных, поэтому их форма приблизительная. ' +
+        esc(M.loot_note || '') + ' Данные проверены: ' + esc(M.checked) + '.</p>' +
       footer() + '</div>';
-    window.DZMap.mount($view.querySelector('.map-page'), M, focusId, (id) => {
+    const nav = (id) => {
       const h = '#map' + (id ? '/' + id : '');
       if (h !== (location.hash || '#')) { replaceHash(h); if (id) trackView('/map/' + id); }
-    });
-    $view.querySelectorAll('[data-route]').forEach((b) => b.addEventListener('click', () => window.DZMap.select(b.dataset.route)));
+    };
+    window.DZMap.mount($view.querySelector('.map-page'), M, state.mapBuildings || null, focusId, nav);
+    if (!state.mapBuildings) {
+      getJSON('data/map-buildings.json').then((b) => { state.mapBuildings = b; window.DZMap.setBuildings(b); }).catch(() => {});
+    }
+    $view.querySelectorAll('[data-route]').forEach((btn) => btn.addEventListener('click', () => window.DZMap.select(btn.dataset.route)));
   }
 
   function viewNotFound() {
