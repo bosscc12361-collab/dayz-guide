@@ -523,7 +523,7 @@
   function trackEvent(name, data) {
     try { if (window.umami && window.umami.track) window.umami.track(name, data); } catch (e) { /* ignore */ }
   }
-  const umamiTag = document.getElementById('umami');
+  const umamiTag = document.getElementById('umami-script');
   if (umamiTag) umamiTag.addEventListener('load', () => { if (pendingView) trackView(pendingView); });
   document.addEventListener('click', (e) => {
     const a = e.target.closest('a.social, a.btn.wiki, [data-share]');
