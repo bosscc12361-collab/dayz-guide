@@ -151,6 +151,8 @@
       state.mapSec = sec;
       state.byId.map = sec;
     } catch (e) { console.warn('Карта не загрузилась', e); }
+    try { state.symptoms = await getJSON('data/symptoms.json'); } catch (e) { console.warn('symptoms', e); }
+    try { state.patches = await getJSON('data/patches.json'); } catch (e) { console.warn('patches', e); }
   }
 
   function buildSearchText(sec, it) {
@@ -245,6 +247,10 @@
         '<span><span class="t-title">' + esc(s.title) + '</span><br><span class="t-short">' + esc(s.short || '') + '</span></span>' +
         (wide ? '' : '<span class="t-count">' + s.items.length + '</span>') +
       '</a>';
+      if (wide && (state.symptoms || state.patches)) {
+        if (state.symptoms) html += '<a class="tile tool-tile" href="#help"><span class="t-ico">🩺</span><span><span class="t-title">Что со мной?</span><br><span class="t-short">Выбери симптомы — подскажу, что это</span></span></a>';
+        if (state.patches) { const v = state.patches.patches[0]; html += '<a class="tile tool-tile" href="#patch"><span class="t-ico">🆕</span><span><span class="t-title">Что нового в ' + esc(v.version) + '</span><br><span class="t-short">Главное из патча для новичка</span></span></a>'; }
+      }
       if (wide && state.map) {
         html += '<a class="tile wide map-tile" href="#map"><span class="t-ico">🗺️</span>' +
           '<span><span class="t-title">Карта Чернаруси</span><br><span class="t-short">Колонки, больницы, полиция, маршруты новичка</span></span></a>';
@@ -507,6 +513,87 @@
     $view.querySelectorAll('[data-route]').forEach((btn) => btn.addEventListener('click', () => window.DZMap.select(btn.dataset.route)));
   }
 
+  // ---------- «Что со мной?» ----------
+  function cardById(ref) {
+    const [sid, id] = ref.split('/');
+    const sec = state.byId[sid];
+    const it = sec && sec.items.find((x) => x.id === id);
+    return it ? [sec, it] : null;
+  }
+  function viewHelp(params) {
+    setChrome('Что со мной?', null, true);
+    const S = state.symptoms;
+    if (!S) { $view.innerHTML = '<div class="empty">Не удалось загрузить данные.</div>'; return; }
+    const sel = new Set((params.get('s') || '').split(',').filter(Boolean));
+    $view.innerHTML = '<p class="help-intro">Отметь всё, что видишь или слышишь у персонажа. Ниже появится, что это может быть и что делать.</p>' +
+      '<div class="sym-grid">' + S.symptoms.map((x) => '<button class="sym' + (sel.has(x.id) ? ' on' : '') + '" data-sym="' + esc(x.id) + '" aria-pressed="' + sel.has(x.id) + '">' +
+        '<span class="sym-i">' + x.icon + '</span><span>' + esc(x.label) + '</span></button>').join('') + '</div>' +
+      '<div id="helpRes"></div><p class="map-note">' + esc(S.note) + '</p>' + footer();
+    const $res = document.getElementById('helpRes');
+    const render = () => {
+      replaceHash('#help' + (sel.size ? '?s=' + [...sel].join(',') : ''));
+      if (!sel.size) { $res.innerHTML = '<div class="empty" style="padding:24px 8px">Выбери хотя бы один симптом 👆</div>'; return; }
+      const scored = S.conditions.map((c) => {
+        let score = 0, hits = 0;
+        for (const k of sel) if (c.w[k]) { score += c.w[k]; hits++; }
+        const total = Object.values(c.w).reduce((a, b) => a + b, 0);
+        return { c, score, hits, fit: score / total };
+      }).filter((x) => x.score > 0).sort((a, b) => b.score - a.score || b.fit - a.fit).slice(0, 4);
+      if (!scored.length) { $res.innerHTML = '<div class="empty">Не нашёл подходящего. Загляни в разделы «Болезни» и «Ранения».</div>'; return; }
+      const best = scored[0].score;
+      $res.innerHTML = '<div class="h-section">Похоже на</div>' + scored.map((x, i) => {
+        const found = cardById(x.c.card); if (!found) return '';
+        const [sec, it] = found;
+        const todo = it.treatment || it.how || it.summary || '';
+        const pct = Math.round(Math.min(1, x.score / Math.max(best, 1)) * 100);
+        return '<a class="help-card' + (i === 0 ? ' top' : '') + '" href="#' + esc(sec.id) + '/' + esc(it.id) + '">' +
+          '<div class="hc-head"><span class="hc-title">' + esc(it.title) + (it.title_en ? ' <span class="r-en">(' + esc(it.title_en) + ')</span>' : '') + '</span>' +
+          '<span class="hc-sec">' + esc(sec.icon) + '</span></div>' +
+          '<div class="hc-bar"><i style="width:' + pct + '%"></i></div>' +
+          (x.c.hint ? '<div class="hc-hint">❓ ' + esc(x.c.hint) + '</div>' : '') +
+          (todo ? '<div class="hc-todo"><b>Что делать:</b> ' + md(todo).replace(/^<p>|<\/p>$/g, '') + '</div>' : '') +
+          '<div class="hc-more">Подробнее →</div></a>';
+      }).join('');
+    };
+    $view.querySelectorAll('[data-sym]').forEach((b) => b.addEventListener('click', () => {
+      const id = b.dataset.sym;
+      if (sel.has(id)) sel.delete(id); else sel.add(id);
+      b.classList.toggle('on', sel.has(id)); b.setAttribute('aria-pressed', sel.has(id));
+      render();
+    }));
+    render();
+  }
+
+  // ---------- «Что нового в патче» ----------
+  function viewPatch(id) {
+    setChrome('Что нового в патче', null, true);
+    const P = state.patches;
+    if (!P) { $view.innerHTML = '<div class="empty">Не удалось загрузить данные.</div>'; return; }
+    let onlyStar = false;
+    const render = () => {
+      $view.innerHTML = '<div class="chips"><button class="chip' + (onlyStar ? '' : ' on') + '" data-f="all">Всё</button>' +
+        '<button class="chip' + (onlyStar ? ' on' : '') + '" data-f="star">⭐ Важное новичку</button></div>' +
+        P.patches.map((v) => {
+          const groups = v.groups.map((g) => {
+            const items = g.items.filter((x) => !onlyStar || x.star);
+            if (!items.length) return '';
+            return '<div class="pg-title">' + esc(g.title) + '</div><ul class="pg-list">' + items.map((x) =>
+              '<li class="' + (x.star ? 'star-item' : '') + '">' + (x.star ? '⭐ ' : '') + esc(x.text) +
+              (x.link ? ' <a href="' + esc(x.link) + '">→</a>' : '') + '</li>').join('') + '</ul>';
+          }).join('');
+          if (!groups) return '';
+          return '<article class="patch" id="p-' + esc(v.id) + '"><div class="patch-head"><span class="patch-v">' + esc(v.version) + '</span>' +
+            '<div><div class="patch-name">' + esc(v.name) + '</div><div class="patch-date">' + esc(v.date) + '</div></div></div>' +
+            '<p class="patch-sum">' + esc(v.summary) + '</p>' + groups + '<div class="patch-builds">' + esc(v.builds) + '</div></article>';
+        }).join('') +
+        (P.upcoming ? '<div class="needs-check">🧪 ' + esc(P.upcoming) + '</div>' : '') +
+        '<p class="map-note">' + esc(P.note) + '</p>' + footer();
+      $view.querySelectorAll('[data-f]').forEach((b) => b.addEventListener('click', () => { onlyStar = b.dataset.f === 'star'; render(); }));
+    };
+    render();
+    if (id) { const el = document.getElementById('p-' + id); if (el) el.scrollIntoView(); }
+  }
+
   function viewNotFound() {
     setChrome('Не найдено', null, true);
     $view.innerHTML = '<div class="empty">Такой карточки нет. Возможно, её переименовали.<br><br><a href="#">На главную</a></div>';
@@ -541,6 +628,8 @@
     else if (parts[0] === 'fav') viewFav();
     else if (parts[0] === 'about') viewAbout();
     else if (parts[0] === 'map') viewMap(parts[1]);
+    else if (parts[0] === 'help') viewHelp(params);
+    else if (parts[0] === 'patch') viewPatch(parts[1]);
     else {
       const sec = state.byId[parts[0]];
       if (!sec) viewNotFound();
