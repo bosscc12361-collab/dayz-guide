@@ -1,0 +1,370 @@
+[
+  {
+    "id": "kos",
+    "title": "KOS",
+    "title_en": "Kill On Sight",
+    "tags": [
+      "сленг",
+      "pvp"
+    ],
+    "beginner": true,
+    "needs_check": false,
+    "summary": "Стрелять сразу, без разговоров.",
+    "meaning": "Kill On Sight: убить при первой встрече, без разговоров.",
+    "example": "«На этом сервере все KOS, к людям не подходи»."
+  },
+  {
+    "id": "fresh",
+    "title": "Фреш / Бэмби",
+    "title_en": "Fresh / Bambi",
+    "tags": [
+      "сленг",
+      "новичок",
+      "спавн"
+    ],
+    "beginner": true,
+    "needs_check": false,
+    "summary": "Только что заспавнившийся игрок.",
+    "meaning": "Игрок, который только появился в игре: без оружия и снаряжения.",
+    "example": "«Да он фреш, у него даже ножа нет»."
+  },
+  {
+    "id": "loot",
+    "title": "Лут / лутать",
+    "title_en": "Loot",
+    "tags": [
+      "сленг",
+      "лут"
+    ],
+    "beginner": true,
+    "needs_check": false,
+    "summary": "Найденные вещи и их сбор.",
+    "meaning": "Лут — найденные вещи. Лутать — собирать их в домах, на базах или с убитых.",
+    "example": "«Пойдём лутать военку»."
+  },
+  {
+    "id": "spawn",
+    "title": "Спавн / респ",
+    "title_en": "Spawn / Respawn",
+    "tags": [
+      "сленг",
+      "спавн"
+    ],
+    "beginner": true,
+    "needs_check": false,
+    "summary": "Появление в игре.",
+    "meaning": "Место и момент появления персонажа. Респ — появиться заново после смерти.",
+    "example": "«Меня убили, я зареспился в Электро»."
+  },
+  {
+    "id": "friendly",
+    "title": "Френдли",
+    "title_en": "Friendly",
+    "tags": [
+      "сленг",
+      "игроки"
+    ],
+    "beginner": true,
+    "needs_check": false,
+    "summary": "Мирный игрок.",
+    "meaning": "Мирный игрок, не стреляет первым. Часто кричат «Friendly!».",
+    "example": "«Френдли, не стреляй!»."
+  },
+  {
+    "id": "pvp-pve",
+    "title": "PvP / PvE",
+    "title_en": "PvP / PvE",
+    "tags": [
+      "сленг",
+      "pvp"
+    ],
+    "beginner": true,
+    "needs_check": false,
+    "summary": "Против людей / против игры.",
+    "meaning": "PvP — бой против игроков. PvE — против игры: заражённые, голод, холод.",
+    "example": "«Сегодня чисто PvE, просто выживаем»."
+  },
+  {
+    "id": "military",
+    "title": "Военка",
+    "title_en": "Military base",
+    "tags": [
+      "сленг",
+      "место"
+    ],
+    "beginner": true,
+    "needs_check": false,
+    "summary": "Военная база.",
+    "meaning": "Военная база или военная точка с хорошим лутом.",
+    "example": "«На северо-западной военке всегда кто-то есть»."
+  },
+  {
+    "id": "nwaf",
+    "title": "Северный аэродром / NWAF",
+    "title_en": "North-West Airfield",
+    "tags": [
+      "сленг",
+      "место",
+      "чернарусь"
+    ],
+    "beginner": false,
+    "needs_check": false,
+    "summary": "Главная военка Чернаруси.",
+    "meaning": "Большой аэродром на северо-западе Чернаруси. Много военного лута и игроков.",
+    "example": "«Иду на NWAF за оружием»."
+  },
+  {
+    "id": "heli",
+    "title": "Хеликраш / хели",
+    "title_en": "Heli crash",
+    "tags": [
+      "сленг",
+      "лут"
+    ],
+    "beginner": false,
+    "needs_check": false,
+    "summary": "Крушение вертолёта.",
+    "meaning": "Упавший вертолёт с редким военным лутом. Появляется в случайных местах.",
+    "example": "«Видел дым — там хеликраш»."
+  },
+  {
+    "id": "tier",
+    "title": "Хай-тир / лоу-тир",
+    "title_en": "High tier / Low tier",
+    "tags": [
+      "сленг",
+      "лут"
+    ],
+    "beginner": false,
+    "needs_check": false,
+    "summary": "Уровень лута.",
+    "meaning": "Уровень лута: на побережье лоу-тир, на крупных военных базах хай-тир.",
+    "example": "«Тут только лоу-тир, иди вглубь»."
+  },
+  {
+    "id": "kit",
+    "title": "Кит / фулл кит",
+    "title_en": "Kit / Full kit",
+    "tags": [
+      "сленг",
+      "снаряжение"
+    ],
+    "beginner": true,
+    "needs_check": false,
+    "summary": "Всё снаряжение.",
+    "meaning": "Полный комплект снаряжения: оружие, броня, рюкзак.",
+    "example": "«У него фулл кит, не лезь»."
+  },
+  {
+    "id": "stash",
+    "title": "Схрон / заначка",
+    "title_en": "Stash",
+    "tags": [
+      "сленг",
+      "база"
+    ],
+    "beginner": false,
+    "needs_check": false,
+    "summary": "Тайник.",
+    "meaning": "Спрятанные вещи: закопанная бочка, ящик, палатка.",
+    "example": "«Я сделал схрон в лесу»."
+  },
+  {
+    "id": "base",
+    "title": "База",
+    "title_en": "Base",
+    "tags": [
+      "сленг",
+      "база"
+    ],
+    "beginner": false,
+    "needs_check": false,
+    "summary": "Постройка игрока.",
+    "meaning": "Постройка игрока: забор, ворота, палатки, ящики.",
+    "example": "«У нас база в лесу у Гвоздно»."
+  },
+  {
+    "id": "raid",
+    "title": "Рейд",
+    "title_en": "Raid",
+    "tags": [
+      "сленг",
+      "база"
+    ],
+    "beginner": false,
+    "needs_check": false,
+    "summary": "Нападение на базу.",
+    "meaning": "Взлом и разграбление чужой базы.",
+    "example": "«Нашу базу зарейдили ночью»."
+  },
+  {
+    "id": "camper",
+    "title": "Кемпер / кемпить",
+    "title_en": "Camper",
+    "tags": [
+      "сленг",
+      "pvp"
+    ],
+    "beginner": true,
+    "needs_check": false,
+    "summary": "Засада.",
+    "meaning": "Сидеть в засаде и ждать, когда кто-то придёт.",
+    "example": "«На вышке кемпер с Мосином»."
+  },
+  {
+    "id": "combat-log",
+    "title": "Комбат-лог",
+    "title_en": "Combat log",
+    "tags": [
+      "сленг",
+      "pvp"
+    ],
+    "beginner": false,
+    "needs_check": false,
+    "summary": "Выход из игры в бою.",
+    "meaning": "Выйти из игры посреди боя, чтобы не умереть. Плохой тон.",
+    "example": "«Он комбат-логнул, когда я начал стрелять»."
+  },
+  {
+    "id": "ghost",
+    "title": "Гостинг",
+    "title_en": "Ghosting",
+    "tags": [
+      "сленг",
+      "pvp"
+    ],
+    "beginner": false,
+    "needs_check": false,
+    "summary": "Обход через перезаход.",
+    "meaning": "Перезайти на другой сервер и вернуться в другом месте, чтобы обойти противника. Плохой тон.",
+    "example": "«Он загостил и зашёл нам за спину»."
+  },
+  {
+    "id": "server-hop",
+    "title": "Сервер-хоп",
+    "title_en": "Server hopping",
+    "tags": [
+      "сленг",
+      "лут"
+    ],
+    "beginner": false,
+    "needs_check": false,
+    "summary": "Лут через смену серверов.",
+    "meaning": "Перескакивать между серверами, чтобы лутать одно и то же место.",
+    "example": "«Он сервер-хопит военку»."
+  },
+  {
+    "id": "desync",
+    "title": "Десинк",
+    "title_en": "Desync",
+    "tags": [
+      "сленг",
+      "техника"
+    ],
+    "beginner": false,
+    "needs_check": false,
+    "summary": "Лаг и рассинхрон.",
+    "meaning": "Рассинхрон: сервер и твой клиент видят разное. Убили «за стеной».",
+    "example": "«Меня убили за углом, десинк»."
+  },
+  {
+    "id": "cz",
+    "title": "КЗ / заражённая зона",
+    "title_en": "Contaminated Zone",
+    "tags": [
+      "сленг",
+      "газ",
+      "место"
+    ],
+    "beginner": false,
+    "needs_check": false,
+    "summary": "Газовая зона.",
+    "meaning": "Зона с токсичным газом. Без противогаза и ОЗК там смерть.",
+    "example": "«Не иди в КЗ без фильтра»."
+  },
+  {
+    "id": "runner",
+    "title": "Бегун",
+    "title_en": "Runner",
+    "tags": [
+      "сленг",
+      "заражённые"
+    ],
+    "beginner": true,
+    "needs_check": false,
+    "summary": "Быстрый заражённый.",
+    "meaning": "Быстрый заражённый, гонится, пока не убьёшь.",
+    "example": "«Сзади бегун, руби его»."
+  },
+  {
+    "id": "zed",
+    "title": "Зед / зомби",
+    "title_en": "Zed / Infected",
+    "tags": [
+      "сленг",
+      "заражённые"
+    ],
+    "beginner": true,
+    "needs_check": false,
+    "summary": "Заражённый.",
+    "meaning": "Заражённый. В игре их называют Infected.",
+    "example": "«Там три зеда у входа»."
+  },
+  {
+    "id": "chernarus",
+    "title": "Чер / Чернарусь",
+    "title_en": "Chernarus",
+    "tags": [
+      "сленг",
+      "карта"
+    ],
+    "beginner": true,
+    "needs_check": false,
+    "summary": "Название карты.",
+    "meaning": "Основная карта DayZ. Есть ещё Ливония (Livonia), Сахал (Sakhal) и Насдара (Nasdara, DLC Badlands).",
+    "example": "«На Чере или на Ливонии?»."
+  },
+  {
+    "id": "elektro",
+    "title": "Электро / Черно",
+    "title_en": "Elektrozavodsk / Chernogorsk",
+    "tags": [
+      "сленг",
+      "место",
+      "чернарусь"
+    ],
+    "beginner": true,
+    "needs_check": false,
+    "summary": "Большие города.",
+    "meaning": "Сокращения больших городов на побережье Чернаруси: Электрозаводск и Черногорск. Много фрешей и PvP.",
+    "example": "«Встретимся в Черно у порта»."
+  },
+  {
+    "id": "bandage-up",
+    "title": "Перебинтоваться",
+    "title_en": "Bandage up",
+    "tags": [
+      "сленг",
+      "медицина"
+    ],
+    "beginner": true,
+    "needs_check": false,
+    "summary": "Перевязаться.",
+    "meaning": "Остановить кровотечение тряпками или бинтом.",
+    "example": "«Стой, мне надо перебинтоваться»."
+  },
+  {
+    "id": "full-blood",
+    "title": "Фулл блад",
+    "title_en": "Full blood",
+    "tags": [
+      "сленг",
+      "медицина"
+    ],
+    "beginner": false,
+    "needs_check": false,
+    "summary": "Полная кровь.",
+    "meaning": "Полная кровь (5000 мл).",
+    "example": "«Я на фулл бладе, готов»."
+  }
+]

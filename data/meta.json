@@ -1,0 +1,210 @@
+{
+  "app_title": "DayZ Guide",
+  "app_subtitle": "Шпаргалка новичка: первые 10 часов",
+  "author": "STROM",
+  "author_tagline": "Зарядка игровым позитивом ⚡",
+  "socials": [
+    {
+      "id": "telegram",
+      "title": "Telegram",
+      "handle": "@strom_u",
+      "url": "https://t.me/strom_u"
+    },
+    {
+      "id": "youtube",
+      "title": "YouTube",
+      "handle": "@STROM_s",
+      "url": "https://www.youtube.com/@STROM_s"
+    },
+    {
+      "id": "tiktok",
+      "title": "TikTok",
+      "handle": "@strom_u",
+      "url": "https://www.tiktok.com/@strom_u"
+    }
+  ],
+  "game_version": "1.30 (PC Stable, Update 3 · 1.30.164289)",
+  "platform": "ПК, ванильная игра (без модов)",
+  "checked_date": "19.11.2026",
+  "show_needs_check": true,
+  "sections": [
+    {
+      "id": "first15",
+      "file": "first15.json",
+      "title": "Первые 15 минут",
+      "icon": "⏱️",
+      "short": "Чек-лист после спавна",
+      "fields": [
+        {
+          "key": "steps",
+          "label": "Шаги",
+          "type": "checklist"
+        }
+      ]
+    },
+    {
+      "id": "food",
+      "file": "food.json",
+      "title": "Еда и вода",
+      "icon": "🥫",
+      "short": "Что есть, что пить, чего избегать",
+      "fields": [
+        {
+          "key": "safe",
+          "label": "Безопасно?",
+          "type": "safety"
+        },
+        {
+          "key": "how",
+          "label": "Как правильно"
+        },
+        {
+          "key": "risk",
+          "label": "Риск"
+        }
+      ]
+    },
+    {
+      "id": "diseases",
+      "file": "diseases.json",
+      "title": "Болезни",
+      "icon": "🦠",
+      "short": "Симптомы → причина → лечение",
+      "fields": [
+        {
+          "key": "symptoms",
+          "label": "Симптомы"
+        },
+        {
+          "key": "cause",
+          "label": "Причина"
+        },
+        {
+          "key": "treatment",
+          "label": "Лечение"
+        },
+        {
+          "key": "prevention",
+          "label": "Как не заболеть"
+        }
+      ]
+    },
+    {
+      "id": "injuries",
+      "file": "injuries.json",
+      "title": "Ранения",
+      "icon": "🩸",
+      "short": "Кровь, переломы, шок",
+      "fields": [
+        {
+          "key": "signs",
+          "label": "Признаки"
+        },
+        {
+          "key": "treatment",
+          "label": "Что делать"
+        },
+        {
+          "key": "items",
+          "label": "Что понадобится",
+          "type": "list"
+        }
+      ]
+    },
+    {
+      "id": "crafting",
+      "file": "crafting.json",
+      "title": "Крафт",
+      "icon": "🛠️",
+      "short": "Рецепты: из чего и чем",
+      "fields": [
+        {
+          "key": "ingredients",
+          "label": "Ингредиенты",
+          "type": "list"
+        },
+        {
+          "key": "tool",
+          "label": "Инструмент"
+        },
+        {
+          "key": "result",
+          "label": "Результат"
+        }
+      ]
+    },
+    {
+      "id": "fire",
+      "file": "fire.json",
+      "title": "Огонь и температура",
+      "icon": "🔥",
+      "short": "Костёр, готовка, холод и жара",
+      "fields": [
+        {
+          "key": "steps",
+          "label": "Порядок действий",
+          "type": "list"
+        }
+      ]
+    },
+    {
+      "id": "infected",
+      "file": "infected.json",
+      "title": "Заражённые",
+      "icon": "🧟",
+      "short": "Слух, зрение, как уйти",
+      "fields": [
+        {
+          "key": "tips",
+          "label": "Советы",
+          "type": "list"
+        }
+      ]
+    },
+    {
+      "id": "weapons",
+      "file": "weapons.json",
+      "title": "Оружие и патроны",
+      "icon": "🔫",
+      "short": "Калибры, магазины, где найти",
+      "filter": "caliber",
+      "filter_label": "Калибр",
+      "fields": [
+        {
+          "key": "caliber",
+          "label": "Калибр"
+        },
+        {
+          "key": "mag",
+          "label": "Магазин"
+        },
+        {
+          "key": "where",
+          "label": "Где чаще встречается"
+        },
+        {
+          "key": "tip",
+          "label": "Совет новичку"
+        }
+      ]
+    },
+    {
+      "id": "slang",
+      "file": "slang.json",
+      "title": "Словарь сленга",
+      "icon": "💬",
+      "short": "KOS, фреш, лутать…",
+      "fields": [
+        {
+          "key": "meaning",
+          "label": "Значение"
+        },
+        {
+          "key": "example",
+          "label": "Пример"
+        }
+      ]
+    }
+  ],
+  "sources": "dayz.wiki.gg, официальные патчноуты Bohemia Interactive"
+}

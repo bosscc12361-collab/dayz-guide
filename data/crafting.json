@@ -1,0 +1,401 @@
+[
+  {
+    "id": "rags",
+    "title": "Тряпки",
+    "title_en": "Rags",
+    "tags": [
+      "крафт",
+      "тряпки",
+      "кровотечение",
+      "одежда"
+    ],
+    "beginner": true,
+    "needs_check": false,
+    "summary": "Основа всего: перевязка, шина, факел, верёвка.",
+    "ingredients": [
+      "Любая тканевая одежда: футболка, рубашка, штаны, шапка (2–4 тряпки)",
+      "Флаг даёт 6 тряпок (поднятый на флагштоке нельзя, с 1.30)"
+    ],
+    "tool": "Любой нож или острый предмет (каменный нож тоже подойдёт)",
+    "result": "Тряпки (Rags)"
+  },
+  {
+    "id": "stone-knife",
+    "title": "Каменный нож",
+    "title_en": "Stone Knife",
+    "tags": [
+      "крафт",
+      "нож",
+      "камень"
+    ],
+    "beginner": true,
+    "needs_check": false,
+    "summary": "Первый нож свежего спавна.",
+    "ingredients": [
+      "Маленький камень (Small Stone)",
+      "Ещё один маленький камень"
+    ],
+    "tool": "Не нужен: соедини камни в руках",
+    "result": "Каменный нож (Stone Knife)"
+  },
+  {
+    "id": "bone-knife",
+    "title": "Костяной нож",
+    "title_en": "Bone Knife",
+    "tags": [
+      "крафт",
+      "нож",
+      "кость",
+      "охота"
+    ],
+    "beginner": true,
+    "needs_check": false,
+    "summary": "Кости остаются после разделки животных.",
+    "ingredients": [
+      "2 кости (Bones) — или 1 кость + большой камень/скала"
+    ],
+    "tool": "Не нужен: держи кости в руках и зажми ЛКМ",
+    "result": "Костяной нож (Bone Knife)"
+  },
+  {
+    "id": "splint",
+    "title": "Шина",
+    "title_en": "Splint",
+    "tags": [
+      "крафт",
+      "шина",
+      "перелом",
+      "палки"
+    ],
+    "beginner": true,
+    "needs_check": false,
+    "summary": "Лечит перелом ноги.",
+    "ingredients": [
+      "4 тряпки (Rags) + 2 короткие палки (Short Stick)",
+      "или: 1 бинт (Bandage) + 2 короткие палки",
+      "или: изолента (Duct Tape) + 2 короткие палки"
+    ],
+    "tool": "Не нужен",
+    "result": "Шина (Splint)"
+  },
+  {
+    "id": "short-stick",
+    "title": "Короткие палки",
+    "title_en": "Short Stick",
+    "tags": [
+      "крафт",
+      "палки",
+      "дерево"
+    ],
+    "beginner": true,
+    "needs_check": false,
+    "summary": "Нужны для шины, факела, костра, рюкзака.",
+    "ingredients": [
+      "Длинная палка (Long Wooden Stick) → 3 короткие",
+      "или: дрова (Firewood) + топор → 3 короткие",
+      "или: метла (Broom) → 3 короткие"
+    ],
+    "tool": "Нож или руки (для дров — топор)",
+    "result": "Короткие палки (Short Stick)",
+    "text": "Длинную палку можно отломать от **куста**: подойди к кусту и выбери действие."
+  },
+  {
+    "id": "sharpened-stick",
+    "title": "Заточенная палка",
+    "title_en": "Sharpened Stick",
+    "tags": [
+      "крафт",
+      "палка",
+      "готовка"
+    ],
+    "beginner": true,
+    "needs_check": false,
+    "summary": "Для жарки мяса на костре. Ещё оружие ближнего боя.",
+    "ingredients": [
+      "Длинная палка (Long Wooden Stick)"
+    ],
+    "tool": "Любой нож",
+    "result": "Заточенная палка (Sharpened Stick)"
+  },
+  {
+    "id": "fireplace",
+    "title": "Костёр",
+    "title_en": "Fireplace",
+    "tags": [
+      "крафт",
+      "костёр",
+      "огонь",
+      "тепло"
+    ],
+    "beginner": true,
+    "needs_check": false,
+    "summary": "Тепло, готовка, кипячение воды.",
+    "ingredients": [
+      "2 любых предмета из растопки/топлива: тряпки, бумага, кора (Bark), бинт, короткие палки, дрова"
+    ],
+    "tool": "Не нужен. Разжечь: спички, зажигалка, ручная дрель, фальшфейер",
+    "result": "Костёр (Fireplace)",
+    "text": "Можно ещё проще: положи растопку на землю и сразу подожги. **8 камней** дают каменное кольцо, **16 камней** — каменную печь."
+  },
+  {
+    "id": "hand-drill",
+    "title": "Ручная дрель (для огня)",
+    "title_en": "Hand Drill Kit",
+    "tags": [
+      "крафт",
+      "огонь",
+      "кора",
+      "без спичек"
+    ],
+    "beginner": true,
+    "needs_check": false,
+    "summary": "Огонь без спичек. Может не сработать с первого раза.",
+    "ingredients": [
+      "Кора (Oak Bark или Birch Bark)",
+      "Короткая палка (Short Stick)"
+    ],
+    "tool": "Не нужен (кору срезают ножом с дерева)",
+    "result": "Ручная дрель (Hand Drill Kit)"
+  },
+  {
+    "id": "torch",
+    "title": "Факел",
+    "title_en": "Torch",
+    "tags": [
+      "крафт",
+      "факел",
+      "свет",
+      "ночь"
+    ],
+    "beginner": true,
+    "needs_check": false,
+    "summary": "Свет и тепло ночью. Зажигается от спичек или костра.",
+    "ingredients": [
+      "Короткая палка (Short Stick)",
+      "Тряпки (Rags)"
+    ],
+    "tool": "Не нужен",
+    "result": "Факел (Torch)",
+    "text": "Горит, пока не прогорят тряпки. Добавь **жир (Animal Fat)** или **бензин**, чтобы горел дольше. Подкидывать тряпки можно и в горящий факел. Длинный факел: длинная палка + тряпки."
+  },
+  {
+    "id": "rope",
+    "title": "Верёвка",
+    "title_en": "Rope",
+    "tags": [
+      "крафт",
+      "верёвка",
+      "тряпки"
+    ],
+    "beginner": true,
+    "needs_check": true,
+    "check_note": "рецепт верёвки в вики отображается неоднозначно",
+    "summary": "Для рюкзака, удочки и связывания.",
+    "ingredients": [
+      "6 тряпок (Rags) + ещё 6 тряпок"
+    ],
+    "tool": "Не нужен",
+    "result": "Верёвка (Rope)"
+  },
+  {
+    "id": "courier-bag",
+    "title": "Мешок-сумка",
+    "title_en": "Improvised Courier Bag",
+    "tags": [
+      "крафт",
+      "рюкзак",
+      "сумка",
+      "мешок"
+    ],
+    "beginner": true,
+    "needs_check": false,
+    "summary": "Первая «сумка» за спину.",
+    "ingredients": [
+      "Мешок (Burlap Sack)",
+      "Верёвка (Rope)"
+    ],
+    "tool": "Не нужен",
+    "result": "Импровизированная сумка (Improvised Courier Bag)"
+  },
+  {
+    "id": "burlap-backpack",
+    "title": "Мешок-рюкзак",
+    "title_en": "Improvised Backpack",
+    "tags": [
+      "крафт",
+      "рюкзак",
+      "мешок"
+    ],
+    "beginner": true,
+    "needs_check": false,
+    "summary": "Вместительнее сумки. Хороший стартовый рюкзак.",
+    "ingredients": [
+      "Импровизированная сумка (Improvised Courier Bag)",
+      "3 короткие палки (Short Stick)"
+    ],
+    "tool": "Не нужен",
+    "result": "Импровизированный рюкзак (Improvised Backpack)"
+  },
+  {
+    "id": "leather-backpack",
+    "title": "Кожаный рюкзак",
+    "title_en": "Improvised Leather Backpack",
+    "tags": [
+      "крафт",
+      "рюкзак",
+      "кожа",
+      "охота"
+    ],
+    "beginner": false,
+    "needs_check": false,
+    "summary": "Для тех, кто охотится.",
+    "ingredients": [
+      "Шкура кабана (Wild Boar Pelt) + верёвка → кожаная сумка",
+      "Кожаная сумка + 3 короткие палки → рюкзак"
+    ],
+    "tool": "Нож (снять шкуру с туши)",
+    "result": "Импровизированный кожаный рюкзак (Improvised Leather Backpack)"
+  },
+  {
+    "id": "fishing-rod",
+    "title": "Простая удочка",
+    "title_en": "Simple Fishing Rod",
+    "tags": [
+      "крафт",
+      "рыбалка",
+      "удочка",
+      "еда"
+    ],
+    "beginner": true,
+    "needs_check": false,
+    "summary": "Еда у воды. Нужны крючок и наживка (червь).",
+    "ingredients": [
+      "Длинная палка (Long Wooden Stick) или заточенная палка",
+      "Верёвка (Rope)"
+    ],
+    "tool": "Не нужен",
+    "result": "Простая удочка (Simple Fishing Rod)"
+  },
+  {
+    "id": "wooden-hook",
+    "title": "Деревянный крючок",
+    "title_en": "Wooden Hook",
+    "tags": [
+      "крафт",
+      "рыбалка",
+      "крючок"
+    ],
+    "beginner": true,
+    "needs_check": true,
+    "check_note": "точное игровое название крючка уточнить",
+    "summary": "Крючок для удочки.",
+    "ingredients": [
+      "Короткая палка (Short Stick)"
+    ],
+    "tool": "Нож",
+    "result": "Деревянный крючок (Wooden Hook)"
+  },
+  {
+    "id": "spear",
+    "title": "Копьё",
+    "title_en": "Improvised Spear",
+    "tags": [
+      "крафт",
+      "копьё",
+      "оружие",
+      "ближний бой"
+    ],
+    "beginner": true,
+    "needs_check": false,
+    "summary": "Длинное оружие ближнего боя против заражённых.",
+    "ingredients": [
+      "Длинная палка (Long Wooden Stick)",
+      "Каменный нож (или костяной нож)"
+    ],
+    "tool": "Не нужен",
+    "result": "Импровизированное копьё (Improvised Spear)"
+  },
+  {
+    "id": "bow",
+    "title": "Лук",
+    "title_en": "Improvised Bow",
+    "tags": [
+      "крафт",
+      "лук",
+      "стрелы",
+      "арбалет"
+    ],
+    "beginner": false,
+    "needs_check": true,
+    "check_note": "вики помечает самодельный лук как устаревший (legacy). Проверь в игре; вместо лука есть арбалет (Crossbow)",
+    "summary": "В актуальной версии самодельный лук, судя по вики, не крафтится.",
+    "ingredients": [
+      "—"
+    ],
+    "tool": "—",
+    "result": "—",
+    "text": "Если нужна тихая дальнобойная альтернатива, ищи **арбалет (Crossbow)** и болты. Самодельные болты (Improvised Bolt) крафтятся."
+  },
+  {
+    "id": "improvised-clothes",
+    "title": "Обмотки из тряпок",
+    "title_en": "Improvised wrappings",
+    "tags": [
+      "крафт",
+      "одежда",
+      "тряпки",
+      "холод"
+    ],
+    "beginner": false,
+    "needs_check": false,
+    "summary": "Если совсем раздет: хоть немного тепла.",
+    "ingredients": [
+      "2 тряпки: на лицо, ноги или руки",
+      "4 тряпки: на голову",
+      "6 тряпок: на ноги или торс"
+    ],
+    "tool": "Не нужен",
+    "result": "Импровизированная одежда"
+  },
+  {
+    "id": "ghillie",
+    "title": "Маскхалат",
+    "title_en": "Ghillie suit",
+    "tags": [
+      "крафт",
+      "маскхалат",
+      "маскировка"
+    ],
+    "beginner": false,
+    "needs_check": true,
+    "check_note": "точное количество полосок и сетки для каждой части в вики неясно",
+    "summary": "Маскировка в траве. Не для первых часов.",
+    "ingredients": [
+      "Мешковина: мешок (Burlap Sack) + нож → полоски (Burlap Strips)",
+      "Сетка (Netting)",
+      "Кол-во зависит от части: капюшон, накидка, куртка, полный костюм"
+    ],
+    "tool": "Нож",
+    "result": "Маскхалат (Ghillie)"
+  },
+  {
+    "id": "bottle-suppressor",
+    "title": "Глушитель из бутылки",
+    "title_en": "Plastic Bottle Suppressor",
+    "tags": [
+      "крафт",
+      "глушитель",
+      "оружие"
+    ],
+    "beginner": false,
+    "needs_check": true,
+    "check_note": "к какому оружию цепляется — уточнить",
+    "summary": "Тише стреляешь, меньше заражённых сбегается. Быстро изнашивается.",
+    "ingredients": [
+      "Пластиковая бутылка (Plastic Bottle)",
+      "Изолента (Duct Tape)"
+    ],
+    "tool": "Не нужен",
+    "result": "Самодельный глушитель"
+  }
+]
