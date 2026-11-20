@@ -1,10 +1,14 @@
-/* Service worker: офлайн-режим.
-   Меняешь код (html/css/js)? Увеличь VERSION на 1, чтобы телефоны подхватили обновление.
-   Данные из /data обновляются сами: сначала показывается сохранённая копия, а свежая скачивается в фоне. */
-const VERSION = 'v19';
+/* Service worker: офлайн-режим и обновления.
+   Меняешь код (html/css/js)? Увеличь VERSION на 1 И номер ?v= в index.html (они должны совпадать),
+   чтобы телефоны подхватили обновление.
+   Страница (index.html) берётся из сети, если она есть (до 3 секунд), иначе из кэша — так онлайн всегда свежая версия.
+   Данные из /data: сначала сохранённая копия, свежая скачивается в фоне. */
+const VERSION = 'v20';
+const V = VERSION.slice(1);
 const CACHE = 'dayz-guide-' + VERSION;
 const SHELL = [
-  './', 'index.html', 'css/style.css', 'js/app.js', 'js/map.js', 'data/map.json', 'data/symptoms.json', 'data/patches.json', 'data/quiz.json', 'manifest.json',
+  './', 'index.html', 'css/style.css?v=' + V, 'js/app.js?v=' + V, 'js/map.js?v=' + V, 'manifest.json',
+  'data/map.json', 'data/symptoms.json', 'data/patches.json', 'data/quiz.json',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'fonts/russo-cyr.woff2', 'fonts/russo-lat.woff2',
   'data/meta.json', 'data/first15.json', 'data/food.json', 'data/diseases.json',
   'data/injuries.json', 'data/crafting.json', 'data/fire.json', 'data/infected.json',
@@ -13,7 +17,11 @@ const SHELL = [
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  // мимо HTTP-кэша браузера; один недоступный файл не ломает всё обновление
+  e.waitUntil(caches.open(CACHE)
+    .then((c) => Promise.all(SHELL.map((u) => fetch(new Request(u, { cache: 'reload' }))
+      .then((r) => (r.ok ? c.put(u, r) : null)).catch(() => null))))
+    .then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (e) => {
@@ -24,20 +32,37 @@ self.addEventListener('activate', (e) => {
   );
 });
 
+self.addEventListener('message', (e) => { if (e.data === 'skipWaiting') self.skipWaiting(); });
+
 self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
-  // кэш + обновление в фоне
+
+  // страница: сначала сеть (с таймаутом), потом кэш
+  if (req.mode === 'navigate') {
+    e.respondWith(caches.open(CACHE).then(async (cache) => {
+      const net = fetch(req, { cache: 'no-cache' }).then((res) => { if (res && res.ok) cache.put('index.html', res.clone()); return res; }).catch(() => null);
+      const timeout = new Promise((r) => setTimeout(() => r(null), 3000));
+      const res = await Promise.race([net, timeout]);
+      if (res) return res;
+      const cached = await cache.match('index.html') || await cache.match('./');
+      if (cached) { e.waitUntil(net); return cached; }
+      return (await net) || Response.error();
+    }));
+    return;
+  }
+
+  // остальное: кэш + обновление в фоне (js/css с ?v= — по точному адресу, данные — без учёта параметров)
+  const versioned = /[?&]v=/.test(req.url);
   e.respondWith(
     caches.open(CACHE).then(async (cache) => {
-      const cached = await cache.match(req, { ignoreSearch: true });
+      const cached = await cache.match(req, { ignoreSearch: !versioned });
       const network = fetch(req).then((res) => {
         if (res && res.ok) cache.put(req, res.clone());
         return res;
       }).catch(() => null);
       if (cached) { e.waitUntil(network); return cached; }
-      const res = await network;
-      return res || (req.mode === 'navigate' ? cache.match('index.html') : Response.error());
+      return (await network) || Response.error();
     })
   );
 });

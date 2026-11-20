@@ -2,6 +2,7 @@
    Данные лежат в /data/*.json, список разделов — в data/meta.json. */
 (function () {
   'use strict';
+  const APP_V = (((document.currentScript && document.currentScript.src) || '').match(/[?&]v=(\d+)/) || [])[1] || '—';
 
   // ---------- безопасное хранилище ----------
   const store = {
@@ -554,6 +555,8 @@
       '<h3>Ссылки на карточки</h3>' +
       '<p>У каждой карточки есть кнопка «Поделиться»: она даёт прямую ссылку на эту карточку.</p>' +
       (fbOn() ? '<h3>Нашёл ошибку или есть идея?</h3><p>Напиши — сообщение придёт автору. Ошибку в конкретной карточке удобнее отправить кнопкой «⚠️ Нашёл ошибку» внизу карточки.</p><button class="btn fb-about" data-fb-idea>💡 Написать автору</button>' : '') +
+      '<h3>Версия приложения</h3><p>Версия <b>' + esc(APP_V) + '</b>. Новая версия подтягивается сама, когда открываешь приложение с интернетом. Если что-то выглядит устаревшим, нажми кнопку — приложение скачается заново. Избранное и галочки сохранятся.</p>' +
+      ('serviceWorker' in navigator ? '<button class="btn upd-btn" data-upd>🔄 Проверить обновления</button>' : '') +
       '<h3>Автор</h3><p>' + esc(m.author || '') + (m.author_tagline ? ': ' + esc(m.author_tagline) : '') + '</p>' + socialsHTML(true) +
       '<h3>Названия предметов</h3><p>Русские названия даны по русской версии игры, в скобках английские. Если в твоей версии перевод отличается, ищи по английскому названию.</p>' +
       (m.sources ? '<h3>Источники</h3><p>' + esc(m.sources) + '</p>' : '') +
@@ -561,6 +564,8 @@
       '<h3>Дисклеймер</h3>' +
       '<p>Неофициальный фанатский справочник. DayZ — торговая марка Bohemia Interactive. Игра часто обновляется, поэтому сверяйтесь с патчноутами.</p>' +
       '</div>' + footer();
+    const ub = $view.querySelector('[data-upd]');
+    if (ub) ub.addEventListener('click', () => { ub.disabled = true; ub.textContent = 'Обновляю…'; window.dzCheckUpdate && window.dzCheckUpdate(); });
     const fi = $view.querySelector('[data-fb-idea]');
     if (fi) fi.addEventListener('click', () => feedback({ type: 'idea', where: 'Общее сообщение (раздел «Инфо»)', hash: '' }));
   }
@@ -1010,9 +1015,35 @@
       (location.protocol === 'file:' ? 'Файл открыт напрямую (file://). Открой приложение через сайт (GitHub Pages) или локальный сервер.' : 'Проверь подключение и обнови страницу.') + '</div>';
   });
 
+  // ---------- обновления приложения ----------
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+    const hadController = !!navigator.serviceWorker.controller;
+    let reg = null, lastCheck = 0, shown = false;
+    const check = () => { if (reg && Date.now() - lastCheck > 60e3) { lastCheck = Date.now(); reg.update().catch(() => {}); } };
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js').catch((e) => console.warn('SW не зарегистрирован', e));
+      navigator.serviceWorker.register('sw.js').then((r) => { reg = r; lastCheck = Date.now(); }).catch((e) => console.warn('SW не зарегистрирован', e));
     });
+    // приложение с экрана «Домой» часто просто разворачивается из фона — проверяем обновление при каждом открытии
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') check(); });
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!hadController || shown) return;
+      shown = true;
+      const bar = document.createElement('div');
+      bar.className = 'upd-bar';
+      bar.innerHTML = '<span>⚡ Вышла новая версия гайда</span><button>Обновить</button>';
+      bar.querySelector('button').addEventListener('click', () => location.reload());
+      document.body.appendChild(bar);
+    });
+    window.dzCheckUpdate = async () => {
+      try {
+        const r = reg || await navigator.serviceWorker.getRegistration();
+        if (r) await r.update();
+      } catch (e) { /* нет сети */ }
+      // если обновление не пришло само — чистим кэш и перезагружаем: при интернете всё скачается заново
+      if (navigator.onLine === false) { toast('Нет интернета — обновиться не получится'); return; }
+      try { for (const k of await caches.keys()) if (k.startsWith('dayz-guide-')) await caches.delete(k); } catch (e) { /* ignore */ }
+      try { const r2 = reg || await navigator.serviceWorker.getRegistration(); if (r2) await r2.unregister(); } catch (e) { /* ignore */ }
+      location.reload();
+    };
   }
 })();
