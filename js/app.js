@@ -153,6 +153,7 @@
     } catch (e) { console.warn('Карта не загрузилась', e); }
     try { state.symptoms = await getJSON('data/symptoms.json'); } catch (e) { console.warn('symptoms', e); }
     try { state.patches = await getJSON('data/patches.json'); } catch (e) { console.warn('patches', e); }
+    try { state.quiz = await getJSON('data/quiz.json'); } catch (e) { console.warn('quiz', e); }
   }
 
   function buildSearchText(sec, it) {
@@ -649,6 +650,92 @@
     $view.querySelectorAll('[data-route]').forEach((btn) => btn.addEventListener('click', () => window.DZMap.select(btn.dataset.route)));
   }
 
+  // ---------- тест «Какой ты игрок» ----------
+  const QUIZ_BEST = 'dz_quiz_best';
+  function quizLevel(score) {
+    const L = state.quiz.levels.slice().sort((a, b) => a.min - b.min);
+    let lv = L[0];
+    for (const l of L) if (score >= l.min) lv = l;
+    return lv;
+  }
+  function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+  function viewQuiz(params) {
+    setChrome('Проверь себя', null, true);
+    const Q = state.quiz;
+    if (!Q) { $view.innerHTML = '<div class="empty">Не удалось загрузить тест.</div>'; return; }
+    const shared = params && params.get('r');
+    const best = store.get(QUIZ_BEST, null);
+    const intro = () => {
+      let html = '<div class="quiz"><div class="qz-hero"><div class="qz-big">🧠</div><h2>' + esc(Q.title) + '</h2><p>' + esc(Q.intro) + '</p>';
+      if (shared && /^\d{1,2}$/.test(shared)) { const lv = quizLevel(+shared); html += '<div class="qz-shared">Твой друг набрал <b>' + esc(shared) + ' из ' + Q.count + '</b> — ' + lv.icon + ' ' + esc(lv.title) + '. Сможешь лучше?</div>'; }
+      html += '<div class="qz-levels">' + Q.levels.map((l) => '<span>' + l.icon + ' ' + esc(l.title) + '</span>').join('') + '</div>' +
+        '<button class="btn qz-go" data-start>Начать тест</button>' +
+        (best != null ? '<p class="qz-best">Твой лучший результат: <b>' + best + ' из ' + Q.count + '</b> — ' + quizLevel(best).icon + ' ' + esc(quizLevel(best).title) + '</p>' : '') +
+        '</div></div>' + footer();
+      $view.innerHTML = html;
+      $view.querySelector('[data-start]').addEventListener('click', start);
+    };
+    let qs, i, score, wrong;
+    const start = () => {
+      qs = shuffle(Q.questions).slice(0, Q.count).map((q) => ({ ...q, opts: shuffle(q.a.map((t, k) => ({ t, ok: k === 0 }))) }));
+      i = 0; score = 0; wrong = [];
+      trackEvent('quiz-start', {});
+      ask();
+    };
+    const ask = () => {
+      const q = qs[i];
+      $view.innerHTML = '<div class="quiz"><div class="qz-top"><span>Вопрос ' + (i + 1) + ' из ' + qs.length + '</span><span>✅ ' + score + '</span></div>' +
+        '<div class="progress"><i style="width:' + Math.round(i / qs.length * 100) + '%"></i></div>' +
+        '<h2 class="qz-q">' + esc(q.q) + '</h2>' +
+        '<div class="qz-opts">' + q.opts.map((o, k) => '<button class="qz-opt" data-k="' + k + '">' + esc(o.t) + '</button>').join('') + '</div>' +
+        '<div class="qz-why" hidden></div></div>';
+      window.scrollTo(0, 0);
+      $view.querySelectorAll('.qz-opt').forEach((b) => b.addEventListener('click', () => answer(+b.dataset.k)));
+    };
+    const answer = (k) => {
+      const q = qs[i], ok = q.opts[k].ok;
+      if (ok) score++; else wrong.push(q);
+      $view.querySelectorAll('.qz-opt').forEach((b, n) => {
+        b.disabled = true;
+        if (q.opts[n].ok) b.classList.add('ok'); else if (n === k) b.classList.add('bad');
+      });
+      $view.querySelector('.qz-top span:last-child').textContent = '✅ ' + score;
+      const why = $view.querySelector('.qz-why');
+      why.innerHTML = '<b>' + (ok ? '✅ Верно!' : '❌ Не совсем.') + '</b> ' + esc(q.why) +
+        '<button class="btn qz-next">' + (i + 1 < qs.length ? 'Дальше' : 'Узнать результат') + '</button>';
+      why.hidden = false;
+      why.querySelector('.qz-next').addEventListener('click', () => { i++; if (i < qs.length) ask(); else result(); });
+      why.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    };
+    const result = () => {
+      const lv = quizLevel(score);
+      const prev = store.get(QUIZ_BEST, null);
+      if (prev == null || score > prev) store.set(QUIZ_BEST, score);
+      trackEvent('quiz-done', { score, level: lv.title });
+      const seen = new Set();
+      const tips = wrong.filter((q) => { if (seen.has(q.card)) return false; seen.add(q.card); return !!cardById(q.card); }).map((q) => {
+        const [sec, it] = cardById(q.card);
+        return '<a class="qz-tip" href="#' + esc(q.card) + '">' + esc(sec.icon) + ' ' + esc(it.title) + '</a>';
+      }).join('');
+      $view.innerHTML = '<div class="quiz"><div class="qz-result"><div class="qz-big">' + lv.icon + '</div>' +
+        '<div class="qz-score">' + score + ' из ' + qs.length + '</div><h2>' + esc(lv.title) + '</h2><p>' + esc(lv.text) + '</p>' +
+        '<button class="btn qz-go" data-share>📤 Поделиться результатом</button>' +
+        '<button class="btn qz-again" data-again>🔄 Пройти ещё раз</button></div>' +
+        (tips ? '<div class="h-section">Почитай, где ошибся</div><div class="qz-tips">' + tips + '</div>' : '') +
+        '</div>' + footer();
+      window.scrollTo(0, 0);
+      $view.querySelector('[data-again]').addEventListener('click', start);
+      $view.querySelector('[data-share]').addEventListener('click', async () => {
+        const url = location.href.split('#')[0] + '#quiz?r=' + score;
+        const text = 'Мой уровень в DayZ: ' + lv.icon + ' ' + lv.title + ' (' + score + ' из ' + qs.length + '). А ты сможешь лучше?';
+        trackEvent('share-click', { card: 'quiz' });
+        try { if (navigator.share) { await navigator.share({ title: Q.title, text, url }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+        try { await navigator.clipboard.writeText(text + ' ' + url); toast('Скопировано — вставь в чат'); } catch (e) { prompt('Скопируй:', text + ' ' + url); }
+      });
+    };
+    intro();
+  }
+
   // ---------- «Что со мной?» ----------
   function cardById(ref) {
     const [sid, id] = ref.split('/');
@@ -766,6 +853,7 @@
     else if (parts[0] === 'map') viewMap(parts[1], params);
     else if (parts[0] === 'help') viewHelp(params);
     else if (parts[0] === 'patch') viewPatch(parts[1]);
+    else if (parts[0] === 'quiz') viewQuiz(params);
     else {
       const sec = state.byId[parts[0]];
       if (!sec) viewNotFound();
