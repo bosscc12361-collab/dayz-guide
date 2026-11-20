@@ -656,3 +656,20 @@ body.is-home .view { padding-top: calc(var(--sat) + 14px); }
 .srv-act { display: flex; flex-direction: column; gap: 6px; }
 .srv-act .btn { width: 100%; height: 42px; font-size: 14.5px; }
 .srv-ip { font-family: ui-monospace, Menlo, monospace; font-weight: 500; color: var(--text-2); }
+
+/* ---------- карта iZurvive ---------- */
+.iz-wrap { position: relative; margin: 0 -16px; height: min(68vh, 640px); min-height: 380px; background: #0a1426; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.iz-wrap iframe { width: 100%; height: 100%; border: 0; display: block; }
+@media (min-width: 720px) { .iz-wrap { margin: 0; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); } }
+.iz-bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 8px 2px 4px; font-size: 15px; }
+.iz-bar span { font-weight: 700; }
+.iz-bar a { color: var(--bolt-light); font-size: 14px; white-space: nowrap; }
+.iz-credit { font-size: 12.5px; color: var(--text-3); margin: 2px 2px 6px; }
+.iz-credit a { color: var(--text-2); }
+.pl-tier { font-size: 13px; font-weight: 700; letter-spacing: .4px; color: var(--text-2); margin: 14px 2px 6px; }
+.pl-btn { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; text-align: left; padding: 11px 14px; margin: 0 0 6px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); color: var(--text); font-size: 15.5px; cursor: pointer; }
+.pl-btn:active { background: var(--card-2); }
+.pl-t { flex: 0 0 auto; font-size: 11.5px; font-weight: 800; padding: 2px 7px; border-radius: 999px; color: #08111f; }
+.pl-t.t1 { background: #3ddc84; } .pl-t.t2 { background: #f0c83c; } .pl-t.t3 { background: #ff8c32; } .pl-t.t4 { background: #f04646; color: #fff; }
+.rc-steps { margin: 8px 0; }
+.rc-steps .pl-btn { padding: 8px 12px; font-size: 14.5px; }
