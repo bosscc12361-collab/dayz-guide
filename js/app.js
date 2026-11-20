@@ -373,12 +373,16 @@
     html += '<div class="d-actions">' +
       '<button class="btn' + (on ? ' on' : '') + '" data-fav="' + esc(k) + '">' + '<span class="lbl">' + (on ? 'В избранном' : 'В избранное') + '</span></button>' +
       '<button class="btn" data-share>' + ICONS.share + 'Поделиться</button></div>';
+    if (fbOn()) html += '<button class="fb-link" data-fb>⚠️ Нашёл ошибку в карточке</button>';
     if (it.wiki && /^https:\/\//.test(it.wiki)) {
       html += '<a class="btn wiki" href="' + esc(it.wiki) + '" target="_blank" rel="noopener">' + ICONS.book +
         'Открыть в DayZ Wiki' + ICONS.ext + '</a>';
     }
     html += '</article>' + footer();
     $view.innerHTML = html;
+
+    const fbBtn = $view.querySelector('[data-fb]');
+    if (fbBtn) fbBtn.addEventListener('click', () => feedback({ type: 'error', where: sec.icon + ' ' + sec.title + ' → ' + it.title, hash: '#' + sec.id + '/' + it.id }));
 
     const share = $view.querySelector('[data-share]');
     share.addEventListener('click', async () => {
@@ -493,6 +497,7 @@
       '<p>Открой сайт в Safari → кнопка «Поделиться» → «На экран Домой». После первого открытия работает без интернета.</p>' +
       '<h3>Ссылки на карточки</h3>' +
       '<p>У каждой карточки есть кнопка «Поделиться»: она даёт прямую ссылку на эту карточку.</p>' +
+      (fbOn() ? '<h3>Нашёл ошибку или есть идея?</h3><p>Напиши — сообщение придёт автору. Ошибку в конкретной карточке удобнее отправить кнопкой «⚠️ Нашёл ошибку» внизу карточки.</p><button class="btn fb-about" data-fb-idea>💡 Написать автору</button>' : '') +
       '<h3>Автор</h3><p>' + esc(m.author || '') + (m.author_tagline ? ': ' + esc(m.author_tagline) : '') + '</p>' + socialsHTML(true) +
       '<h3>Названия предметов</h3><p>Русские названия даны по русской версии игры, в скобках английские. Если в твоей версии перевод отличается, ищи по английскому названию.</p>' +
       (m.sources ? '<h3>Источники</h3><p>' + esc(m.sources) + '</p>' : '') +
@@ -500,6 +505,57 @@
       '<h3>Дисклеймер</h3>' +
       '<p>Неофициальный фанатский справочник. DayZ — торговая марка Bohemia Interactive. Игра часто обновляется, поэтому сверяйтесь с патчноутами.</p>' +
       '</div>' + footer();
+    const fi = $view.querySelector('[data-fb-idea]');
+    if (fi) fi.addEventListener('click', () => feedback({ type: 'idea', where: 'Общее сообщение (раздел «Инфо»)', hash: '' }));
+  }
+
+  // ---------- обратная связь ----------
+  const FB_KEY = 'dz_fb_sent';
+  function fbOn() { const f = state.meta && state.meta.feedback; return !!(f && /^https:\/\//.test(f.endpoint || '')); }
+  function feedback(ctx) {
+    const idea = ctx.type === 'idea';
+    const wrap = document.createElement('div');
+    wrap.className = 'fb-modal';
+    wrap.innerHTML = '<div class="fb-back" data-close></div>' +
+      '<form class="fb-sheet" novalidate>' +
+        '<div class="fb-head"><b>' + (idea ? '💡 Написать автору' : '⚠️ Ошибка в карточке') + '</b><button type="button" class="fb-x" data-close aria-label="Закрыть">×</button></div>' +
+        (idea ? '' : '<div class="fb-where">' + esc(ctx.where) + '</div>') +
+        '<label class="fb-l">' + (idea ? 'Сообщение' : 'Что не так?') + '</label>' +
+        '<textarea name="text" rows="4" maxlength="1000" required placeholder="' + (idea ? 'Идея, вопрос, что добавить…' : 'Например: в магазине 5 патронов, а не 10') + '"></textarea>' +
+        (idea ? '' : '<label class="fb-l">Как правильно <span>(необязательно)</span></label><textarea name="fix" rows="2" maxlength="1000"></textarea>') +
+        '<input name="website" tabindex="-1" autocomplete="off" class="fb-hp" aria-hidden="true">' +
+        '<p class="fb-note">Сообщение анонимное. Личные данные не нужны.</p>' +
+        '<div class="fb-err" hidden></div>' +
+        '<button class="btn fb-send" type="submit">Отправить</button>' +
+      '</form>';
+    document.body.appendChild(wrap);
+    const form = wrap.querySelector('form'), ta = form.text, err = wrap.querySelector('.fb-err'), send = wrap.querySelector('.fb-send');
+    const close = () => { wrap.remove(); document.removeEventListener('keydown', onKey); };
+    const onKey = (e) => { if (e.key === 'Escape') close(); };
+    document.addEventListener('keydown', onKey);
+    wrap.querySelectorAll('[data-close]').forEach((x) => x.addEventListener('click', close));
+    setTimeout(() => ta.focus(), 50);
+    const fail = (m) => { err.textContent = m; err.hidden = false; send.disabled = false; send.textContent = 'Отправить'; };
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const text = ta.value.trim();
+      if (text.length < 3) return fail('Напиши хотя бы пару слов.');
+      const now = Date.now();
+      const sent = (store.get(FB_KEY, []) || []).filter((t) => now - t < 3600e3);
+      if (sent.length >= 5) return fail('Слишком много сообщений за час. Попробуй позже.');
+      send.disabled = true; send.textContent = 'Отправляю…'; err.hidden = true;
+      try {
+        const r = await fetch(state.meta.feedback.endpoint, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: ctx.type, where: ctx.where, hash: ctx.hash, text, fix: form.fix ? form.fix.value.trim() : '', website: form.website.value, v: state.meta.checked_date || '' }),
+        });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok || !j.ok) return fail(j.error === 'limit' ? 'Слишком много сообщений за час. Попробуй позже.' : 'Не получилось отправить. Проверь интернет и попробуй ещё раз.');
+        sent.push(now); store.set(FB_KEY, sent);
+        trackEvent('feedback-sent', { type: ctx.type });
+        close(); toast('Спасибо! Сообщение отправлено ⚡');
+      } catch (e2) { fail('Нет интернета? Сообщение не отправилось.'); }
+    });
   }
 
   function viewMap(focusId) {

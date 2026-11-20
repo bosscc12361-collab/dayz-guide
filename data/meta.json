@@ -314,5 +314,8 @@
       ]
     }
   ],
-  "sources": "dayz.wiki.gg, официальные патчноуты Bohemia Interactive; карта и «где найти» — официальные данные DayZ Central Economy (github.com/BohemiaInteractive)"
+  "sources": "dayz.wiki.gg, официальные патчноуты Bohemia Interactive; карта и «где найти» — официальные данные DayZ Central Economy (github.com/BohemiaInteractive)",
+  "feedback": {
+    "endpoint": "https://dayz-feedback.boss-c-c12361.workers.dev"
+  }
 }
