@@ -93,10 +93,11 @@
   function socialsHTML(noHeader) {
     const list = (state.meta && state.meta.socials) || [];
     if (!list.length) return '';
-    return (noHeader ? '' : '<div class="h-section">⚡ ' + esc(state.meta.author || 'Автор') + ' в соцсетях</div>') +
-      '<div class="socials">' + list.map((x) =>
-        '<a class="social ' + (x.id === 'telegram' ? 'tg' : '') + '" href="' + esc(x.url) + '" target="_blank" rel="noopener">' +
-        (SOCIAL_ICONS[x.id] || '') + '<span>' + esc(x.title) + '</span><small>' + esc(x.handle || '') + '</small></a>').join('') +
+    void noHeader;
+    return '<div class="socials">' + list.map((x) =>
+        '<a class="social ' + (x.id === 'telegram' ? 'tg' : '') + '" href="' + esc(x.url) + '" target="_blank" rel="noopener" ' +
+        'aria-label="' + esc(x.title + (x.handle ? ' ' + x.handle : '')) + '" title="' + esc(x.title + (x.handle ? ' ' + x.handle : '')) + '">' +
+        (SOCIAL_ICONS[x.id] || esc(x.title)) + '</a>').join('') +
       '</div>';
   }
 

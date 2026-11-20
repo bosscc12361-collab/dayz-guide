@@ -296,13 +296,13 @@ mark { background: rgba(47,123,255,.35); color: inherit; border-radius: 3px; pad
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 
 /* ---------- соцсети STROM ---------- */
-.socials { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.socials { display: flex; justify-content: center; gap: 14px; margin: 28px 0 6px; }
 .social {
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
-  min-height: 78px; border-radius: 16px; text-decoration: none; color: var(--text);
-  background: var(--card); border: 1px solid var(--line); font-weight: 700; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  width: 56px; height: 56px; border-radius: 50%; text-decoration: none; color: var(--text);
+  background: var(--card); border: 1px solid var(--line);
 }
-.social svg { width: 28px; height: 28px; }
+.social svg { width: 26px; height: 26px; }
 .social:active { background: var(--card-2); }
 .social.tg { border-color: rgba(95,176,255,.55); background: linear-gradient(160deg, rgba(47,123,255,.35), var(--card)); }
 .social small { font-weight: 500; color: var(--text-3); font-size: 12px; margin-top: -4px; }
