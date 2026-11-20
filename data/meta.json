@@ -317,5 +317,53 @@
   "sources": "dayz.wiki.gg, официальные патчноуты Bohemia Interactive; карта и «где найти» — официальные данные DayZ Central Economy (github.com/BohemiaInteractive)",
   "feedback": {
     "endpoint": "https://dayz-feedback.boss-c-c12361.workers.dev"
-  }
+  },
+  "home": [
+    {
+      "title": "Начни здесь",
+      "icon": "🚀",
+      "items": [
+        "first15",
+        "week",
+        "controls",
+        "hud",
+        "loadout"
+      ]
+    },
+    {
+      "items": [
+        "map"
+      ]
+    },
+    {
+      "title": "Выживание",
+      "icon": "❤️",
+      "items": [
+        "help",
+        "food",
+        "diseases",
+        "injuries",
+        "fire",
+        "crafting"
+      ]
+    },
+    {
+      "title": "Бой и игроки",
+      "icon": "⚔️",
+      "items": [
+        "weapons",
+        "infected",
+        "players"
+      ]
+    },
+    {
+      "title": "Справочники",
+      "icon": "📚",
+      "items": [
+        "loot",
+        "slang",
+        "patch"
+      ]
+    }
+  ]
 }

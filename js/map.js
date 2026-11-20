@@ -34,6 +34,7 @@
     spawn: { t: 'Зона спавна', i: '🟢', d: 'Здесь появляются свежие игроки. Вокруг много кепок, и всё уже обыскано — уходи вглубь.', link: ['#first15/fresh-spawn', 'Чек-лист спавна'] }
   };
 
+  let lootF = null; // фильтр «где найти»: { usage:[], tiers:Set }
   let D = null, B = null, svg, canvas, ctx, wrap, sheet, tip, vb, layersOn = {}, onNavigate = null, raf = 0, dpr = 1, bg = null;
   const Y = (z) => D.size - z;
 
@@ -90,6 +91,7 @@
     if (id) attrs['data-id'] = id;
     const g = el('g', attrs, parent);
     g.innerHTML = inner;
+    g._x = x; g._z = z;
     return g;
   }
 
@@ -131,6 +133,7 @@
         for (let gx = 0; gx < n; gx++) {
           const t = +row[gx];
           if (!t) continue;
+          if (lootF && lootF.tiers.size && !lootF.tiers.has(t)) continue;
           ctx.fillStyle = TCOL[t];
           ctx.fillRect(sx(gx * cell), sy((gz + 1) * cell), cell * k + 1, cell * k + 1);
         }
@@ -280,6 +283,38 @@
       if (v.length === 1) return { n: 1, vb: { ...vb }, cx: v[0].x, cy: v[0].y };
       return null;
     }
+  }
+
+  function tierAt(x, z) {
+    if (!D.tiers) return 0;
+    const n = D.tiers.n, cell = D.size / n;
+    const gx = Math.min(n - 1, Math.max(0, Math.floor(x / cell))), gz = Math.min(n - 1, Math.max(0, Math.floor(z / cell)));
+    return +D.tiers.rows[gz][gx] || 0;
+  }
+  // какие слои включить для usage из types.xml
+  const USAGE_LAYER = { Medic: 'medical', Police: 'police', Military: 'military', Hunting: 'hunting', ContaminatedArea: 'gas' };
+  const TOWNISH = ['Town', 'Village', 'Farm', 'Industrial', 'Office', 'School', 'Firefighter', 'Coast', 'Lunapark'];
+  function setLoot(f) {
+    lootF = f ? { usage: f.usage || [], tiers: new Set(f.tiers || []) } : null;
+    if (lootF) {
+      LAYERS.forEach((l) => { layersOn[l.id] = false; });
+      lootF.usage.forEach((u) => { if (USAGE_LAYER[u]) layersOn[USAGE_LAYER[u]] = true; });
+      layersOn.tiers = lootF.tiers.size > 0;
+    } else LAYERS.forEach((l) => { layersOn[l.id] = l.on; });
+    if (!svg) return;
+    const towns = lootF && (lootF.usage.some((u) => TOWNISH.includes(u)) || !lootF.usage.length);
+    const big = lootF && (lootF.usage.includes('Town') || !lootF.usage.length), small = lootF && lootF.usage.some((u) => u !== 'Town' && TOWNISH.includes(u));
+    svg.classList.toggle('loot-mode', !!lootF);
+    svg.querySelectorAll('.mk').forEach((m) => {
+      if (!lootF || m._x == null) { m.classList.remove('dim', 'hl'); return; }
+      const okTier = !lootF.tiers.size || lootF.tiers.has(tierAt(m._x, m._z));
+      const isTown = m.classList.contains('mk-town');
+      const want = isTown ? (towns && ((big && m.classList.contains('town-big')) || (small && m.classList.contains('town-small')) || (!big && !small))) : true;
+      m.classList.toggle('dim', !(okTier && want));
+      m.classList.toggle('hl', !!(isTown && okTier && want));
+    });
+    document.querySelectorAll('[data-layer-toggle]').forEach((b) => b.classList.toggle('on', !!layersOn[b.getAttribute('data-layer-toggle')]));
+    applyLayers();
   }
 
   function applyLayers() {
@@ -465,7 +500,7 @@
   // ---------- публичный API ----------
   window.DZMap = {
     LAYERS, routeHTML, lootHTML,
-    mount(container, data, buildings, focusId, navCb) {
+    mount(container, data, buildings, focusId, navCb, loot) {
       D = data; B = buildings; onNavigate = navCb || null;
       if (!Object.keys(layersOn).length) LAYERS.forEach((l) => { layersOn[l.id] = l.on; });
       wrap = container.querySelector('.map-wrap');
@@ -493,6 +528,7 @@
         lg.innerHTML = legendHTML(); lg.hidden = !lg.hidden;
         const c = lg.querySelector('.tip-close'); if (c) c.addEventListener('click', () => { lg.hidden = true; });
       });
+      setLoot(loot || null);
       setTimeout(() => {
         resizeCanvas(); fitAll();
         if (focusId) select(focusId, false);
@@ -500,6 +536,7 @@
       window.addEventListener('resize', onResize);
     },
     setBuildings(b) { B = b; requestDraw(); },
+    setLoot(f) { setLoot(f); requestDraw(); },
     select(id) {
       if (!svg) return;
       const top = wrap.getBoundingClientRect().top + window.scrollY - (document.getElementById('topbar').offsetHeight || 0) - 8;

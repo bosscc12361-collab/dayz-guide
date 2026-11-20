@@ -563,3 +563,29 @@ mark { background: rgba(47,123,255,.35); color: inherit; border-radius: 3px; pad
 .fb-err { color: #ff8a8a; font-size: 14px; margin: 6px 0; }
 .fb-send { width: 100%; background: linear-gradient(180deg, var(--bolt), var(--bolt-deep)); border-color: transparent; color: #fff; }
 .fb-send:disabled { opacity: .6; }
+
+/* ---------- группы плиток на главной ---------- */
+.g-head { display: flex; align-items: center; gap: 8px; margin: 26px 2px 10px; font-family: var(--display); font-weight: 400;
+  font-size: 15px; letter-spacing: .6px; text-transform: uppercase; color: var(--bolt-light); }
+.g-head::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(95,176,255,.45), transparent); }
+.g-ico { font-size: 18px; }
+.grid + .grid { margin-top: 10px; }
+@media (max-width: 559px) { .tile.span2 { grid-column: 1 / -1; min-height: 0; flex-direction: row; align-items: center; gap: 12px; } }
+
+/* ---------- «Где найти» на карте ---------- */
+.loot-pick { display: flex; flex-direction: column; gap: 6px; margin: 0 0 10px; }
+.loot-pick label { font-family: var(--display); font-size: 14px; letter-spacing: .4px; color: var(--bolt-light); text-transform: uppercase; }
+.loot-pick select { width: 100%; height: 46px; border-radius: 12px; border: 1px solid rgba(95,176,255,.45); background: var(--card); color: var(--text); font-size: 16px; padding: 0 12px; }
+.loot-hint { font-size: 14px; color: var(--text-2); margin: 0 0 10px; }
+.loot-banner { background: linear-gradient(140deg, rgba(47,123,255,.22), var(--card)); border: 1px solid rgba(95,176,255,.5); border-radius: 14px; padding: 12px 14px; margin: 0 0 10px; }
+.lb-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 17px; }
+.lb-x { background: none; border: 0; color: var(--text); font-size: 20px; cursor: pointer; padding: 2px 6px; }
+.lb-txt { font-size: 15px; margin: 6px 0; }
+.lb-note { font-size: 13px; color: var(--text-2); margin: 4px 0; }
+.lb-link { font-size: 14px; color: var(--bolt-light); }
+.btn.map-btn { display: flex; width: 100%; box-sizing: border-box; margin: 12px 0 0; text-decoration: none; color: var(--bolt-light); border-color: rgba(95,176,255,.5); }
+.map-svg.loot-mode .mk.dim { opacity: .18; }
+.map-svg.loot-mode .mk.dim .cap, .map-svg.loot-mode .mk.dim .tl { display: none; }
+.map-svg.loot-mode [data-layer="hunting"] .mk { display: inline; }
+.map-svg.loot-mode .mk-town.hl .tdot { fill: #ffd84a; }
+.map-svg.loot-mode .mk-town.hl .tl { display: block; fill: #ffe98a; }

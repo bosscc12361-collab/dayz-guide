@@ -239,24 +239,7 @@
     if (m.public_stats && m.public_stats.enabled) html += '<div class="live" id="live" hidden></div>';
     html += '<a href="#search" class="searchbox" style="display:block;text-decoration:none">' + ICONS.search +
       '<input type="text" readonly tabindex="-1" placeholder="Поиск по всем разделам…" style="pointer-events:none"></a>';
-    html += '<div class="grid">';
-    state.sections.forEach((s) => {
-      const wide = s.id === 'first15';
-      html += '<a class="tile' + (wide ? ' wide' : '') + '" href="#' + esc(s.id) + '">' +
-        '<span class="t-ico">' + esc(s.icon) + '</span>' +
-        '<span><span class="t-title">' + esc(s.title) + '</span><br><span class="t-short">' + esc(s.short || '') + '</span></span>' +
-        (wide ? '' : '<span class="t-count">' + s.items.length + '</span>') +
-      '</a>';
-      if (wide && (state.symptoms || state.patches)) {
-        if (state.symptoms) html += '<a class="tile tool-tile" href="#help"><span class="t-ico">🩺</span><span><span class="t-title">Что со мной?</span><br><span class="t-short">Выбери симптомы — подскажу, что это</span></span></a>';
-        if (state.patches) { const v = state.patches.patches[0]; html += '<a class="tile tool-tile" href="#patch"><span class="t-ico">🆕</span><span><span class="t-title">Что нового в ' + esc(v.version) + '</span><br><span class="t-short">Главное из патча для новичка</span></span></a>'; }
-      }
-      if (wide && state.map) {
-        html += '<a class="tile wide map-tile" href="#map"><span class="t-ico">🗺️</span>' +
-          '<span><span class="t-title">Карта Чернаруси</span><br><span class="t-short">Колонки, больницы, полиция, маршруты новичка</span></span></a>';
-      }
-    });
-    html += '</div>';
+    html += homeGroups();
 
     const favRows = favItems();
     if (favRows.length) {
@@ -269,6 +252,37 @@
     $view.innerHTML = html;
     void first;
     liveStats.show();
+  }
+
+  // плитки главной, сгруппированные по meta.home
+  function homeTile(id) {
+    const tile = (href, ico, title, short, cls, count) => '<a class="tile' + (cls ? ' ' + cls : '') + '" href="' + href + '">' +
+      '<span class="t-ico">' + ico + '</span>' +
+      '<span><span class="t-title">' + esc(title) + '</span><br><span class="t-short">' + esc(short) + '</span></span>' +
+      (count != null ? '<span class="t-count">' + count + '</span>' : '') + '</a>';
+    if (id === 'map') return state.map ? tile('#map', '🗺️', 'Карта Чернаруси', 'Колонки, больницы, полиция, маршруты новичка, где искать лут', 'wide map-tile') : '';
+    if (id === 'help') return state.symptoms ? tile('#help', '🩺', 'Что со мной?', 'Выбери симптомы — подскажу, что это', 'tool-tile') : '';
+    if (id === 'patch') { if (!state.patches) return ''; const v = state.patches.patches[0]; return tile('#patch', '🆕', 'Что нового в ' + v.version, 'Главное из патча для новичка', 'tool-tile'); }
+    if (id === 'quiz') return state.quiz ? tile('#quiz', '🧠', 'Проверь себя', 'Какой у тебя уровень в DayZ?', 'tool-tile') : '';
+    const s = state.byId[id];
+    if (!s || !s.items) return '';
+    return tile('#' + s.id, esc(s.icon), s.title, s.short || '', s.id === 'first15' ? 'wide' : '', s.id === 'first15' ? null : s.items.length);
+  }
+  function homeGroups() {
+    const groups = (state.meta.home || []).map((g) => ({ ...g, items: g.items.slice() }));
+    const used = new Set(groups.flatMap((g) => g.items));
+    const rest = state.sections.map((s) => s.id).filter((id) => !used.has(id));
+    if (rest.length) groups.push({ title: 'Ещё', icon: '➕', items: rest });
+    if (!groups.length) groups.push({ items: state.sections.map((s) => s.id) });
+    return groups.map((g) => {
+      const arr = g.items.map(homeTile).filter(Boolean);
+      const narrow = arr.filter((t) => !/class="tile wide/.test(t));
+      if (narrow.length % 2 === 1) { const last = narrow[narrow.length - 1]; arr[arr.lastIndexOf(last)] = last.replace('class="tile', 'class="tile span2'); }
+      const tiles = arr.join('');
+      if (!tiles) return '';
+      return (g.title ? '<h2 class="g-head"><span class="g-ico">' + g.icon + '</span>' + esc(g.title) + '</h2>' : '') +
+        '<div class="grid">' + tiles + '</div>';
+    }).join('');
   }
 
   function viewSection(sec, params) {
@@ -373,6 +387,7 @@
     html += '<div class="d-actions">' +
       '<button class="btn' + (on ? ' on' : '') + '" data-fav="' + esc(k) + '">' + '<span class="lbl">' + (on ? 'В избранном' : 'В избранное') + '</span></button>' +
       '<button class="btn" data-share>' + ICONS.share + 'Поделиться</button></div>';
+    if (it.spawn && it.spawn.nominal > 0 && state.map) html += '<a class="btn map-btn" href="#map?loot=' + esc(sec.id) + '/' + esc(it.id) + '">🗺️ Где искать на карте</a>';
     if (fbOn()) html += '<button class="fb-link" data-fb>⚠️ Нашёл ошибку в карточке</button>';
     if (it.wiki && /^https:\/\//.test(it.wiki)) {
       html += '<a class="btn wiki" href="' + esc(it.wiki) + '" target="_blank" rel="noopener">' + ICONS.book +
@@ -558,14 +573,50 @@
     });
   }
 
-  function viewMap(focusId) {
+  // предметы, которые можно показать на карте (есть официальные данные спавна)
+  function lootItems() {
+    const out = [];
+    ['loot', 'weapons'].forEach((sid) => { const s = state.byId[sid]; if (s) s.items.forEach((it) => { if (it.spawn) out.push([s, it]); }); });
+    return out;
+  }
+  const NO_LAYER = { Farm: 'фермы', Industrial: 'промзоны', Office: 'офисы', School: 'школы', Firefighter: 'пожарные части', Coast: 'побережье', Prison: 'тюрьма', Lunapark: 'парк аттракционов' };
+  function lootBanner(ref) {
+    const c = ref && cardById(ref);
+    if (!c) return '<div class="loot-hint">🔎 Выбери предмет — карта подсветит, где его искать.</div>';
+    const [sec, it] = c, sp = it.spawn;
+    const extra = (sp.usage || []).filter((u) => NO_LAYER[u]).map((u) => NO_LAYER[u]);
+    return '<div class="loot-banner"><div class="lb-top"><b>' + esc(sec.icon) + ' ' + esc(it.title) + '</b>' +
+      '<button class="lb-x" data-loot-clear aria-label="Сбросить">✕</button></div>' +
+      '<div class="lb-txt">' + esc(it.where) + '</div>' +
+      (sp.nominal === 0 ? '' :
+        (extra.length ? '<div class="lb-note">' + esc(extra.join(', ')) + ' на схеме не отмечены отдельно — они есть почти в каждом посёлке, подсвеченные посёлки — в нужных зонах.</div>' : '') +
+        '<div class="lb-note">Подсвечено: подходящие места в нужных зонах лута. Остальное приглушено.</div>') +
+      '<a class="lb-link" href="#' + esc(sec.id) + '/' + esc(it.id) + '">Открыть карточку →</a></div>';
+  }
+  function lootFilter(ref) {
+    const c = ref && cardById(ref);
+    if (!c || !c[1].spawn || !c[1].spawn.nominal) return null;
+    const sp = c[1].spawn;
+    return { usage: sp.usage || [], tiers: (sp.tier || []).map((t) => +String(t).replace(/\D/g, '')).filter(Boolean) };
+  }
+
+  function viewMap(focusId, params) {
+    const lootRef = params ? params.get('loot') : null;
     setChrome('Карта Чернаруси', null, true);
     if (!state.map || !window.DZMap) { $view.innerHTML = '<div class="empty">Карта не загрузилась. Проверь интернет и обнови страницу.</div>'; return; }
     const M = state.map;
     const chips = window.DZMap.LAYERS.map((l) => '<button class="chip" data-layer-toggle="' + l.id + '">' + l.icon + ' ' + esc(l.title) + '</button>').join('');
     const card = (r) => '<div class="route-card ' + r.verdict + '"><div class="rc-title">' + (r.verdict === 'good' ? '✅ ' : '❌ ') + esc(r.title) + '</div>' +
       window.DZMap.routeHTML(r) + '<button class="btn" data-route="' + esc(r.id) + '">🧭 Показать на карте</button></div>';
+    const opts = (() => {
+      const groups = {};
+      lootItems().forEach(([sec, it]) => { const g = sec.id === 'weapons' ? 'Оружие' : 'Предметы и патроны'; (groups[g] = groups[g] || []).push([sec, it]); });
+      return Object.keys(groups).map((g) => '<optgroup label="' + g + '">' + groups[g].sort((a, b) => a[1].title.localeCompare(b[1].title, 'ru'))
+        .map(([sec, it]) => { const v = sec.id + '/' + it.id; return '<option value="' + esc(v) + '"' + (v === lootRef ? ' selected' : '') + '>' + esc(it.title) + '</option>'; }).join('') + '</optgroup>').join('');
+    })();
     $view.innerHTML = '<div class="map-page">' +
+      '<div class="loot-pick"><label for="lootSel">🔎 Где найти на карте</label><select id="lootSel"><option value="">— выбери предмет —</option>' + opts + '</select></div>' +
+      '<div id="lootInfo">' + (lootRef ? lootBanner(lootRef) : '') + '</div>' +
       '<div class="chips map-layers">' + chips + '</div>' +
       '<div class="map-wrap"><div class="map-ctrl">' +
         '<button data-zoom="in" aria-label="Приблизить">+</button><button data-zoom="out" aria-label="Отдалить">−</button>' +
@@ -582,7 +633,19 @@
       const h = '#map' + (id ? '/' + id : '');
       if (h !== (location.hash || '#')) { replaceHash(h); if (id) trackView('/map/' + id); }
     };
-    window.DZMap.mount($view.querySelector('.map-page'), M, null, focusId, nav);
+    window.DZMap.mount($view.querySelector('.map-page'), M, null, focusId, nav, lootFilter(lootRef));
+    const sel = document.getElementById('lootSel'), info = document.getElementById('lootInfo');
+    const applyLoot = (ref) => {
+      info.innerHTML = ref ? lootBanner(ref) : '';
+      window.DZMap.setLoot(lootFilter(ref));
+      replaceHash('#map' + (ref ? '?loot=' + ref : ''));
+      if (ref) trackEvent('map-loot', { item: ref });
+      const x = info.querySelector('[data-loot-clear]');
+      if (x) x.addEventListener('click', () => { sel.value = ''; applyLoot(''); });
+    };
+    sel.addEventListener('change', () => applyLoot(sel.value));
+    const x0 = info.querySelector('[data-loot-clear]');
+    if (x0) x0.addEventListener('click', () => { sel.value = ''; applyLoot(''); });
     $view.querySelectorAll('[data-route]').forEach((btn) => btn.addEventListener('click', () => window.DZMap.select(btn.dataset.route)));
   }
 
@@ -700,7 +763,7 @@
     else if (parts[0] === 'search') viewSearch(params);
     else if (parts[0] === 'fav') viewFav();
     else if (parts[0] === 'about') viewAbout();
-    else if (parts[0] === 'map') viewMap(parts[1]);
+    else if (parts[0] === 'map') viewMap(parts[1], params);
     else if (parts[0] === 'help') viewHelp(params);
     else if (parts[0] === 'patch') viewPatch(parts[1]);
     else {

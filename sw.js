@@ -1,7 +1,7 @@
 /* Service worker: офлайн-режим.
    Меняешь код (html/css/js)? Увеличь VERSION на 1, чтобы телефоны подхватили обновление.
    Данные из /data обновляются сами: сначала показывается сохранённая копия, а свежая скачивается в фоне. */
-const VERSION = 'v15';
+const VERSION = 'v17';
 const CACHE = 'dayz-guide-' + VERSION;
 const SHELL = [
   './', 'index.html', 'css/style.css', 'js/app.js', 'js/map.js', 'data/map.json', 'data/symptoms.json', 'data/patches.json', 'manifest.json',
