@@ -481,8 +481,7 @@
 
   async function share(id) {
     const url = location.href.split('#')[0] + '#map/' + id;
-    try { if (navigator.share) { await navigator.share({ title: 'Карта DayZ — DayZ Guide', url }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
-    try { await navigator.clipboard.writeText(url); window.dzToast && window.dzToast('Ссылка скопирована'); } catch (e) { prompt('Скопируй ссылку:', url); }
+    if (window.dzShare) window.dzShare({ id: 'map/' + id, title: 'Карта DayZ — DayZ Guide', text: 'Карта DayZ — DayZ Guide', url });
   }
 
   function legendHTML() {

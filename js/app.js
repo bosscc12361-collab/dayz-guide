@@ -108,6 +108,50 @@
 
   let toastTimer;
   window.dzToast = (m) => toast(m);
+
+  // ---------- «Поделиться»: своё окно, работает везде ----------
+  function copyText(t) {
+    const ta = document.createElement('textarea');
+    ta.value = t; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+    document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, t.length);
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    ta.remove();
+    if (ok) return Promise.resolve(true);
+    return navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(t).then(() => true, () => false) : Promise.resolve(false);
+  }
+  function shareSheet(o) {
+    const full = (o.text ? o.text + ' ' : '') + o.url;
+    const enc = encodeURIComponent;
+    const wrap = document.createElement('div');
+    wrap.className = 'fb-modal';
+    wrap.innerHTML = '<div class="fb-back" data-close></div><div class="fb-sheet sh-sheet">' +
+      '<div class="fb-head"><b>📤 Поделиться</b><button type="button" class="fb-x" data-close aria-label="Закрыть">×</button></div>' +
+      (o.text ? '<p class="sh-text">' + esc(o.text) + '</p>' : '') +
+      '<input class="sh-url" readonly value="' + esc(o.url) + '">' +
+      '<div class="sh-grid">' +
+        '<button class="btn" data-copy>📋 Скопировать</button>' +
+        '<a class="btn" target="_blank" rel="noopener" href="https://t.me/share/url?url=' + enc(o.url) + (o.text ? '&text=' + enc(o.text) : '') + '">✈️ Telegram</a>' +
+        '<a class="btn" target="_blank" rel="noopener" href="https://wa.me/?text=' + enc(full) + '">💬 WhatsApp</a>' +
+        (navigator.share ? '<button class="btn" data-native>⋯ Другие</button>' : '<a class="btn" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=' + enc(o.url) + '">📘 Facebook</a>') +
+      '</div></div>';
+    document.body.appendChild(wrap);
+    const close = () => wrap.remove();
+    wrap.querySelectorAll('[data-close]').forEach((x) => x.addEventListener('click', close));
+    wrap.querySelectorAll('a.btn').forEach((a) => a.addEventListener('click', () => { trackEvent('share-click', { card: o.id || '', via: a.textContent.trim() }); setTimeout(close, 300); }));
+    const inp = wrap.querySelector('.sh-url');
+    inp.addEventListener('focus', () => inp.select());
+    wrap.querySelector('[data-copy]').addEventListener('click', async () => {
+      const ok = await copyText(full);
+      if (ok) { toast('Скопировано — вставь в чат'); trackEvent('share-click', { card: o.id || '', via: 'copy' }); close(); }
+      else { inp.focus(); inp.select(); toast('Выдели ссылку и скопируй'); }
+    });
+    const nat = wrap.querySelector('[data-native]');
+    if (nat) nat.addEventListener('click', async () => {
+      try { await navigator.share({ title: o.title, text: o.text, url: o.url }); close(); } catch (e) { /* отмена */ }
+    });
+  }
+  window.dzShare = shareSheet;
   function toast(msg) {
     $toast.textContent = msg;
     $toast.classList.add('show');
@@ -401,14 +445,10 @@
     if (fbBtn) fbBtn.addEventListener('click', () => feedback({ type: 'error', where: sec.icon + ' ' + sec.title + ' → ' + it.title, hash: '#' + sec.id + '/' + it.id }));
 
     const share = $view.querySelector('[data-share]');
-    share.addEventListener('click', async () => {
+    share.addEventListener('click', () => {
       const url = location.href.split('#')[0] + '#' + sec.id + '/' + it.id;
       const title = it.title + (it.title_en ? ' (' + it.title_en + ')' : '') + ' — DayZ Guide';
-      try {
-        if (navigator.share) { await navigator.share({ title, url }); return; }
-      } catch (e) { if (e && e.name === 'AbortError') return; }
-      try { await navigator.clipboard.writeText(url); toast('Ссылка скопирована'); }
-      catch (e) { prompt('Скопируй ссылку:', url); }
+      shareSheet({ id: sec.id + '/' + it.id, title, text: title, url });
     });
 
     const cl = $view.querySelector('[data-checklist]');
@@ -725,12 +765,10 @@
         '</div>' + footer();
       window.scrollTo(0, 0);
       $view.querySelector('[data-again]').addEventListener('click', start);
-      $view.querySelector('[data-share]').addEventListener('click', async () => {
+      $view.querySelector('[data-share]').addEventListener('click', () => {
         const url = location.href.split('#')[0] + '#quiz?r=' + score;
         const text = 'Мой уровень в DayZ: ' + lv.icon + ' ' + lv.title + ' (' + score + ' из ' + qs.length + '). А ты сможешь лучше?';
-        trackEvent('share-click', { card: 'quiz' });
-        try { if (navigator.share) { await navigator.share({ title: Q.title, text, url }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
-        try { await navigator.clipboard.writeText(text + ' ' + url); toast('Скопировано — вставь в чат'); } catch (e) { prompt('Скопируй:', text + ' ' + url); }
+        shareSheet({ id: 'quiz', title: Q.title, text, url });
       });
     };
     intro();

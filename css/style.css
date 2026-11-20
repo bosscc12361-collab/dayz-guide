@@ -615,3 +615,9 @@ mark { background: rgba(47,123,255,.35); color: inherit; border-radius: 3px; pad
 .qz-next { width: 100%; margin-top: 12px; background: linear-gradient(180deg, var(--bolt), var(--bolt-deep)); border-color: transparent; color: #fff; }
 .qz-tips { display: flex; flex-direction: column; gap: 8px; }
 .qz-tip { padding: 12px 14px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); color: var(--text); text-decoration: none; }
+
+/* ---------- окно «Поделиться» ---------- */
+.sh-text { font-size: 15px; margin: 4px 0 10px; color: var(--text-2); }
+.sh-url { width: 100%; box-sizing: border-box; height: 42px; border-radius: 10px; border: 1px solid var(--line); background: #070d1c; color: var(--bolt-light); font-size: 14px; padding: 0 10px; margin-bottom: 12px; }
+.sh-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.sh-grid .btn { width: 100%; box-sizing: border-box; text-decoration: none; font-size: 15px; }
