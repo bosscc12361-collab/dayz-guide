@@ -312,6 +312,21 @@
           "label": "Пример"
         }
       ]
+    },
+    {
+      "id": "srv",
+      "file": "srv.json",
+      "title": "Как выбрать сервер",
+      "icon": "🖥️",
+      "short": "Официальный или community, 1PP или 3PP, PvP или PvE",
+      "hidden_home": true,
+      "fields": [
+        {
+          "key": "tips",
+          "label": "Коротко",
+          "type": "list"
+        }
+      ]
     }
   ],
   "sources": "dayz.wiki.gg, официальные патчноуты Bohemia Interactive; карта и «где найти» — официальные данные DayZ Central Economy (github.com/BohemiaInteractive)",
@@ -327,7 +342,8 @@
         "week",
         "controls",
         "hud",
-        "loadout"
+        "loadout",
+        "servers"
       ]
     },
     {

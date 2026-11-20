@@ -199,6 +199,7 @@
     try { state.symptoms = await getJSON('data/symptoms.json'); } catch (e) { console.warn('symptoms', e); }
     try { state.patches = await getJSON('data/patches.json'); } catch (e) { console.warn('patches', e); }
     try { state.quiz = await getJSON('data/quiz.json'); } catch (e) { console.warn('quiz', e); }
+    try { state.servers = await getJSON('data/servers.json'); } catch (e) { console.warn('servers', e); }
   }
 
   function buildSearchText(sec, it) {
@@ -310,6 +311,7 @@
     if (id === 'help') return state.symptoms ? tile('#help', '🩺', 'Что со мной?', 'Выбери симптомы — подскажу, что это', 'tool-tile') : '';
     if (id === 'patch') { if (!state.patches) return ''; const v = state.patches.patches[0]; return tile('#patch', '🆕', 'Что нового в ' + v.version, 'Главное из патча для новичка', 'tool-tile'); }
     if (id === 'quiz') return state.quiz ? tile('#quiz', '🧠', 'Проверь себя', 'Какой у тебя уровень в DayZ?', 'tool-tile') : '';
+    if (id === 'servers') return state.servers ? tile('#servers', '🖥️', 'Серверы для новичка', 'Как выбрать сервер и где играть — с живым онлайном', 'tool-tile') : '';
     const s = state.byId[id];
     if (!s || !s.items) return '';
     return tile('#' + s.id, esc(s.icon), s.title, s.short || '', s.id === 'first15' ? 'wide' : '', s.id === 'first15' ? null : s.items.length);
@@ -317,7 +319,7 @@
   function homeGroups() {
     const groups = (state.meta.home || []).map((g) => ({ ...g, items: g.items.slice() }));
     const used = new Set(groups.flatMap((g) => g.items));
-    const rest = state.sections.map((s) => s.id).filter((id) => !used.has(id));
+    const rest = state.sections.filter((s) => !s.hidden_home).map((s) => s.id).filter((id) => !used.has(id));
     if (rest.length) groups.push({ title: 'Ещё', icon: '➕', items: rest });
     if (!groups.length) groups.push({ items: state.sections.map((s) => s.id) });
     return groups.map((g) => {
@@ -695,6 +697,60 @@
     $view.querySelectorAll('[data-route]').forEach((btn) => btn.addEventListener('click', () => window.DZMap.select(btn.dataset.route)));
   }
 
+  // ---------- серверы ----------
+  function viewServers() {
+    setChrome('Серверы', null, true);
+    const S = state.servers;
+    if (!S) { $view.innerHTML = '<div class="empty">Не удалось загрузить список серверов.</div>'; return; }
+    const guide = state.byId.srv;
+    let n = 0;
+    const card = (sv) => {
+      const i = n++;
+      return '<div class="srv" data-i="' + i + '">' +
+        '<div class="srv-top"><span class="srv-flag">' + sv.flag + '</span><span class="srv-name">' + esc(sv.name) + '</span></div>' +
+        '<div class="srv-live" data-live>⏳ Узнаю онлайн…</div>' +
+        '<div class="srv-tags">' + sv.tags.map((t) => '<span>' + esc(t) + '</span>').join('') + '</div>' +
+        '<p class="srv-why">' + esc(sv.why) + '</p>' +
+        '<div class="srv-act"><button class="btn" data-copy="' + esc(sv.search) + '">🔎 Скопировать «' + esc(sv.search) + '»</button>' +
+        '<button class="btn srv-ip" data-copy="' + esc(sv.ip + ':' + sv.port) + '">IP ' + esc(sv.ip + ':' + sv.port) + '</button></div></div>';
+    };
+    const all = [];
+    let html = '<p class="help-intro">Подборка серверов для старта: Чернарусь, без модов, подключаются прямо из игры. Онлайн и время суток — живые. Ниже — как выбрать сервер самому.</p>' +
+      '<button class="btn srv-refresh" data-refresh>🔄 Обновить онлайн</button>';
+    S.groups.forEach((g) => {
+      html += '<h2 class="g-head"><span class="g-ico">' + g.icon + '</span>' + esc(g.title) + '</h2><p class="srv-gtext">' + esc(g.text) + '</p>' +
+        g.servers.map((sv) => { all.push(sv); return card(sv); }).join('');
+    });
+    if (guide) html += '<h2 class="g-head"><span class="g-ico">📖</span>Как выбрать сервер</h2><div class="list">' + guide.items.map((it) => row(guide, it, false)).join('') + '</div>';
+    html += '<p class="map-note">' + esc(S.note) + ' Подборка проверена: ' + esc(S.checked) + '.</p>' + footer();
+    $view.innerHTML = html;
+    $view.querySelectorAll('[data-copy]').forEach((b) => b.addEventListener('click', async () => {
+      const ok = await copyText(b.dataset.copy);
+      toast(ok ? 'Скопировано: ' + b.dataset.copy : 'Не получилось скопировать');
+    }));
+    const load = () => all.forEach((sv, i) => {
+      const box = $view.querySelector('.srv[data-i="' + i + '"] [data-live]');
+      if (!box) return;
+      box.className = 'srv-live'; box.textContent = '⏳ Узнаю онлайн…';
+      const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 9000);
+      fetch(S.api + sv.ip + '/' + sv.q, { signal: ctl.signal }).then((r) => r.json()).then((j) => {
+        clearTimeout(tm);
+        const d = j && j.result;
+        if (!d || j.status !== 0) throw new Error('no data');
+        const h = parseInt(String(d.time || '').split(':')[0], 10);
+        const day = h >= 6 && h < 20;
+        const fill = d.maxPlayers ? d.players / d.maxPlayers : 0;
+        const lvl = d.players === 0 ? 'empty' : fill < 0.6 ? 'ok' : fill < 0.9 ? 'busy' : 'full';
+        box.className = 'srv-live ' + lvl;
+        box.innerHTML = '<b>👥 ' + d.players + ' / ' + d.maxPlayers + '</b>' +
+          '<span>' + (isNaN(h) ? '' : (day ? '☀️ день' : '🌙 ночь') + ' · ' + esc(d.time) + ' в игре') + '</span>' +
+          '<span>' + (d.firstPersonOnly ? '1PP' : '3PP') + (d.password ? ' · 🔒 пароль' : '') + (d.mods && d.mods.length ? ' · моды: ' + d.mods.length : '') + '</span>';
+      }).catch(() => { clearTimeout(tm); box.className = 'srv-live off'; box.textContent = '⚪ Не удалось узнать онлайн — сервер выключен или нет интернета.'; });
+    });
+    $view.querySelector('[data-refresh]').addEventListener('click', load);
+    load();
+  }
+
   // ---------- тест «Какой ты игрок» ----------
   const QUIZ_BEST = 'dz_quiz_best';
   function quizLevel(score) {
@@ -899,6 +955,7 @@
     else if (parts[0] === 'help') viewHelp(params);
     else if (parts[0] === 'patch') viewPatch(parts[1]);
     else if (parts[0] === 'quiz') viewQuiz(params);
+    else if (parts[0] === 'servers') viewServers();
     else {
       const sec = state.byId[parts[0]];
       if (!sec) viewNotFound();
