@@ -870,6 +870,8 @@
     $title.textContent = tab === 'home' ? '' : title;
     $back.hidden = !showBack;
     document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('active', t.dataset.tab === tab));
+    document.body.classList.toggle('is-home', tab === 'home');
+    document.body.classList.remove('bar-hide');
     document.title = title === 'DayZ Guide' ? 'DayZ Guide' : title + ' · DayZ Guide';
   }
 
@@ -1014,6 +1016,22 @@
     $view.innerHTML = '<div class="empty">Не удалось загрузить данные.<br><small>' + esc(e.message) + '</small><br><br>' +
       (location.protocol === 'file:' ? 'Файл открыт напрямую (file://). Открой приложение через сайт (GitHub Pages) или локальный сервер.' : 'Проверь подключение и обнови страницу.') + '</div>';
   });
+
+  // ---------- верхняя полоса прячется при прокрутке вниз ----------
+  (() => {
+    let lastY = window.scrollY, ticking = false;
+    window.addEventListener('scroll', () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const y = window.scrollY, dy = y - lastY;
+        if (y < 40 || dy < -6) document.body.classList.remove('bar-hide');
+        else if (dy > 6) document.body.classList.add('bar-hide');
+        if (Math.abs(dy) > 6) lastY = y;
+        ticking = false;
+      });
+    }, { passive: true });
+  })();
 
   // ---------- обновления приложения ----------
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {

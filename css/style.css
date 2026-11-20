@@ -628,3 +628,10 @@ mark { background: rgba(47,123,255,.35); color: inherit; border-radius: 3px; pad
 .upd-bar button { flex: 0 0 auto; height: 38px; padding: 0 14px; border-radius: 10px; border: 0; background: #fff; color: #0b1a36; font-weight: 700; font-size: 15px; cursor: pointer; }
 .upd-btn { width: 100%; margin: 4px 0 8px; }
 @media (min-width: 600px) { .upd-bar { left: 50%; right: auto; transform: translateX(-50%); width: 440px; } }
+
+/* ---------- верхняя полоса: на главной только подложка под часы, на остальных прячется при прокрутке ---------- */
+.topbar { transition: transform .25s ease, height .2s ease; }
+body.bar-hide .topbar { transform: translateY(calc(-1 * var(--topbar-h))); }
+body.is-home .topbar { height: var(--sat); border-bottom: 0; overflow: hidden; transform: none; }
+body.is-home .topbar > * { display: none; }
+body.is-home .view { padding-top: calc(var(--sat) + 14px); }
