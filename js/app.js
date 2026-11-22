@@ -193,7 +193,7 @@
       state.map = await getJSON('data/map.json');
       const sec = { id: 'map', title: 'Карта', icon: '🗺️', fields: [], items: [] };
       sec.items = state.map.towns.map((t) => ({ id: t.id, title: t.name, title_en: t.en, summary: t.big ? 'Город на карте Чернаруси' : 'Деревня на карте Чернаруси', tags: ['карта', 'город'] }))
-        .concat(state.map.military.map((m) => ({ id: m.id, title: m.name, summary: 'Военный объект на карте', tags: ['карта', 'военка', 'военная база'] })))
+        .concat(state.map.military.map((m) => ({ id: m.id, title: m.name, title_en: m.en, summary: 'Военный объект на карте', tags: ['карта', 'военка', 'военная база'] })))
         .concat(state.map.routes.map((r) => ({ id: r.id, title: r.title, summary: (r.verdict === 'good' ? '✅ Хороший маршрут: ' : '❌ Ошибка новичка: ') + r.summary, tags: ['маршрут', 'карта'] })));
       sec.items.forEach((it) => { it._search = norm([it.title, it.title_en, it.summary, it.tags.join(' ')].join(' ')); });
       state.mapSec = sec;
@@ -745,7 +745,7 @@
     const places = () => {
       if (state.places && state.places.full) return state.places;
       const L = M.towns.map((t) => ({ i: t.big ? '🏙️' : '🏘️', name: t.name, en: t.en, sub: t.big ? 'город' : 'деревня', x: t.x, z: t.z, w: t.big ? 0 : 1 }))
-        .concat(M.military.map((m) => ({ i: '🎖️', name: m.name, sub: 'военный объект', x: m.x, z: m.z, w: 3 })));
+        .concat(M.military.map((m) => ({ i: '🎖️', name: m.name, en: m.en, sub: 'военный объект', x: m.x, z: m.z, w: 3 })));
       const P = state.mapPoi;
       if (P) {
         P.poi.filter((p) => ['camp', 'castle', 'prison', 'mil'].includes(p.k)).forEach((p) => L.push({ i: p.k === 'camp' ? '🏕️' : p.k === 'castle' ? '🏰' : p.k === 'mil' ? '🎖️' : '⛓️', name: p.t, sub: 'рядом: ' + p.s, x: p.x, z: p.z, w: p.k === 'mil' ? 4 : 2 }));
