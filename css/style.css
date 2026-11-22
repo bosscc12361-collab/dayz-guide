@@ -705,3 +705,33 @@ body.is-home .view { padding-top: calc(var(--sat) + 14px); }
 .map-svg.lv2:not(.has-sel-route) .route { opacity: .38; stroke-width: 3; }
 .map-svg.loot-mode .mk-town.town-big.dim { opacity: .8; }
 .map-svg.loot-mode .mk-town.town-big.dim .tl { display: block; }
+
+/* ---------- карта: метки, слои ---------- */
+.map-pop { position: absolute; z-index: 7; left: 8px; right: 62px; top: 10px; max-height: calc(100% - 20px); overflow: auto; background: rgba(10,18,38,.97); border: 1px solid rgba(95,176,255,.45); border-radius: 14px; padding: 10px 12px; box-shadow: 0 8px 28px rgba(0,0,0,.55); }
+.map-pop[hidden] { display: none; }
+.pop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.pop-grid .chip { height: auto; min-height: 38px; padding: 5px 9px; font-size: 13px; line-height: 1.2; white-space: normal; text-align: left; border-radius: 11px; opacity: .5; justify-content: flex-start; }
+.pop-grid .chip.on { opacity: 1; background: var(--card-2); color: #fff; border-color: rgba(95,176,255,.6); box-shadow: none; }
+.pop-save { width: 100%; height: auto; min-height: 42px; margin-top: 10px; font-size: 13.5px; padding: 6px 10px; }
+.map-ctrl { gap: 5px; }
+.map-ctrl button { width: 40px; height: 40px; }
+.map-page .map-wrap { height: min(70dvh, 760px); }
+.map-svg .poi-bg { fill: rgba(10,18,38,.86); stroke: rgba(190,215,255,.75); stroke-width: 1; }
+.map-svg .poi-i { font-size: 11.5px; stroke: none; }
+.map-svg .mk-poi { display: none; }
+.map-svg .pv0, .map-svg.lv1 .pv1, .map-svg.lv2 .pv2 { display: inline; }
+.map-svg .mk-poi.sel { display: inline; }
+.map-svg .cap-p { display: none; }
+.map-svg.lv3 .cap-p, .map-svg.lv2 .mil2 .cap-p, .map-svg.lv2 .pv0 .cap-p { display: block; }
+.map-svg .mil2 .cap-p { fill: #ffd27a; }
+.map-svg .nm { font: italic 600 10px -apple-system, sans-serif; fill: #e6d6a8; text-anchor: middle; pointer-events: none; }
+.map-svg .mk-name { display: none; }
+.map-svg.lv1 .n-hill, .map-svg.lv1 .n-sea, .map-svg.lv1 .n-lake, .map-svg.lv2 .n-loc { display: inline; }
+.map-svg .n-sea .nm, .map-svg .n-lake .nm { fill: #9fd0ff; }
+.map-svg .n-loc .nm { fill: #d9e2c4; font-size: 9px; }
+.map-svg.lv1 [data-layer="hunting"] .mk { display: none; }
+.map-svg.lv2 [data-layer="hunting"] .mk { display: inline; }
+.map-svg:not(.lv1) .cap-1, .map-svg:not(.lv2) .mk-clinic .cap { display: none; }
+.map-svg .poi-i { font-size: 10.5px; }
+.map-svg .mk.noi { display: none !important; }
+.map-svg .mk.nol .cap, .map-svg .mk.nol .tl, .map-svg .mk.nol .nm { display: none !important; }

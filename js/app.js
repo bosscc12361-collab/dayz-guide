@@ -651,7 +651,7 @@
     const u = sp.usage || [];
     if (u.includes('Medic')) { M.points.hospital.forEach((p) => add('✚ Больница — ' + nearestTown(p[0], p[1]), p[0], p[1])); M.points.clinic.forEach((p) => add('✚ Медпункт — ' + nearestTown(p[0], p[1]), p[0], p[1])); }
     if (u.includes('Police')) M.points.police.forEach((p) => add('🚓 Полиция — ' + nearestTown(p[0], p[1]), p[0], p[1]));
-    if (u.includes('Military')) { M.military.forEach((m) => add('🎖️ ' + m.name, m.x, m.z)); notes.push('Мелкие военные точки (палатки, блокпосты, вышки) есть по всей карте — их на карте отдельно не отметили.'); }
+    if (u.includes('Military')) { M.military.forEach((m) => add('🎖️ ' + m.name, m.x, m.z)); if (state.mapPoi) state.mapPoi.poi.filter((p) => p.k === 'mil').forEach((p) => add('🎖️ ' + p.t + ' — ' + p.s, p.x, p.z)); }
     if (u.includes('Hunting')) notes.push('Охотничьи вышки стоят почти в каждом лесу — включён слой «Вышки».');
     if (u.includes('Town')) M.towns.filter((t) => t.big).forEach((t) => add('🏙️ ' + t.name, t.x, t.z));
     const villageish = u.filter((x) => ['Village', 'Farm', 'Industrial', 'Office', 'School', 'Firefighter', 'Coast'].includes(x));
@@ -712,12 +712,12 @@
     const card = (r) => '<div class="route-card ' + r.verdict + '"><div class="rc-title">' + (r.verdict === 'good' ? '✅ ' : '❌ ') + esc(r.title) + '</div>' +
       DM.routeHTML(r) + '<button class="btn" data-route="' + esc(r.id) + '">🧭 Показать на карте</button></div>';
     $view.innerHTML = '<div class="map-page">' +
-      '<div class="chips map-layers">' + chips + '</div>' +
       '<div class="map-wrap"><div class="map-ctrl">' +
+        '<button data-zoom="layers" aria-label="Слои карты">☰</button>' +
         '<button data-zoom="in" aria-label="Приблизить">+</button><button data-zoom="out" aria-label="Отдалить">−</button>' +
         '<button data-zoom="fit" aria-label="Вся карта">⤢</button><button data-zoom="legend" aria-label="Обозначения">?</button>' +
         '<button data-mode="me" aria-label="Отметить, где я">📍</button><button data-mode="draw" aria-label="Нарисовать маршрут">✏️</button>' +
-      '</div><div class="map-mode" hidden></div><div class="map-tip" hidden></div><div class="map-legend" hidden></div><div class="map-sheet" hidden></div></div>' +
+      '</div><div class="map-pop" hidden><button class="tip-close" aria-label="Закрыть">×</button><div class="lg-title">Что показывать</div><div class="pop-grid">' + chips + '</div><button class="btn pop-save" data-save>⬇️ Сохранить подробную карту офлайн (7 МБ)</button></div><div class="map-mode" hidden></div><div class="map-tip" hidden></div><div class="map-legend" hidden></div><div class="map-sheet" hidden></div></div>' +
       '<p class="map-credit">Карта: © Bohemia Interactive, <a href="https://github.com/BohemiaInteractive/DayZ-Central-Economy" target="_blank" rel="noopener">DayZ Central Economy</a>, лицензия <a href="https://www.bohemia.net/community/licenses/arma-and-dayz-public-license-share-alike-adpl-sa" target="_blank" rel="noopener">ADPL-SA</a>. Доработка: STROM.</p>' +
       '<datalist id="townList">' + towns.map((t) => '<option value="' + esc(t.name) + '">' + esc(t.en || '') + '</option>').join('') + '</datalist>' +
       '<h2 class="g-head"><span class="g-ico">📍</span>Где я и куда иду</h2>' +
@@ -781,6 +781,23 @@
     const pick = (inp, fn) => inp.addEventListener('change', () => { if (!inp.value.trim()) return fn(null); const t = findTown(inp.value); if (!t) return toast('Не нашёл такой город'); inp.value = t.name; inp.blur(); fn(t); });
     pick(meIn, (t) => { DM.setMe(t && { x: t.x, z: t.z, name: t.name }); if (t) { toMap(); const s = DM.getState(); if (s.dest) DM.setDest(s.dest); else DM.flyTo(t.x, t.z, 3600); trackEvent('map-me', { town: t.name }); } });
     pick(destIn, (t) => { DM.setDest(t && { x: t.x, z: t.z, name: t.name }); if (t) { toMap(); if (!DM.getState().me) DM.flyTo(t.x, t.z, 3600); } });
+    // панель слоёв и сохранение карты
+    const pop = page.querySelector('.map-pop');
+    page.querySelector('[data-zoom="layers"]').addEventListener('click', () => { pop.hidden = !pop.hidden; page.querySelector('.map-legend').hidden = true; });
+    pop.querySelector('.tip-close').addEventListener('click', () => { pop.hidden = true; });
+    page.querySelector('[data-zoom="legend"]').addEventListener('click', () => { pop.hidden = true; });
+    const save = pop.querySelector('[data-save]');
+    if (!('caches' in window)) save.hidden = true;
+    save.addEventListener('click', async () => {
+      save.disabled = true;
+      const list = DM.tileList(); let done = 0, bad = 0;
+      try {
+        const c = await caches.open('dayz-tiles-1');
+        const work = async () => { while (list.length) { const u = list.pop(); try { if (!(await c.match(u))) { const r = await fetch(u); if (!r.ok) throw 0; await c.put(u, r); } } catch (e) { bad++; } done++; save.textContent = 'Сохраняю… ' + Math.round(done / (done + list.length) * 100) + '%'; } };
+        await Promise.all([1, 2, 3, 4, 5, 6].map(work));
+        save.textContent = bad ? 'Не скачалось: ' + bad + '. Нажми ещё раз' : '✅ Карта сохранена офлайн'; save.disabled = !bad;
+      } catch (e) { save.textContent = 'Не получилось сохранить'; save.disabled = false; }
+    });
     const sel = document.getElementById('lootSel'), info = document.getElementById('lootInfo');
     bindGo(info);
     sel.addEventListener('change', () => {
@@ -794,6 +811,8 @@
       const had = DM.getState().mine.length;
       if (pts.length > 1) setTimeout(() => { if (!had || confirm('Открыть маршрут из ссылки? Твой нарисованный маршрут заменится.')) DM.setMine(pts); replaceHash('#map'); }, 60);
     }
+    if (state.mapPoi) DM.setPoi(state.mapPoi);
+    else getJSON('data/map-poi.json').then((v) => { state.mapPoi = v; DM.setPoi(v); }).catch((e) => console.warn('map-poi', e));
     if (state.mapVec) DM.setVectors(state.mapVec);
     else getJSON('data/map-vec.json').then((v) => { state.mapVec = v; DM.setVectors(v); }).catch((e) => console.warn('map-vec', e));
   }

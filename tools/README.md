@@ -34,3 +34,9 @@
 - `python3 tools/gen_paths.py ПАПКА data/map.json tools/tga.py tools/route_via.json` — маршруты по дорогам (`paths.json`); ручные точки маршрута — в `route_via.json`;
 - `python3 tools/gen_rails.py ПАПКА tools/tga.py` — сшивает рельсы в линии.
 `gen_map.py` создаёт `map.json` без `path`, `background` и `danger`: после него маршруты и эти поля нужно добавить снова.
+
+## Карта: плитки и метки
+- `python3 tools/gen_roads.py ПАПКА data/map.json tools/tga.py` — линии главных дорог (`roads.json`);
+- `python3 tools/gen_detail.py ПАПКА tools/tga.py ВЫХОД` — подробные плитки 512 px (16×16); плитки, целиком состоящие из моря, пропускаются (`skip.json` → `background.skip`);
+- `python3 tools/gen_poi.py ПАПКА data/map.json` — `data/map-poi.json` (нужны ещё `mapgroupproto.xml`, `cfgeventspawns.xml` и `names.json` с названиями мест из конфигурации игры).
+Если плитки меняются, переименуй кэш `dayz-tiles-1` в `sw.js` и `app.js`, иначе телефоны оставят старые.
