@@ -1322,8 +1322,11 @@
     });
     // приложение с экрана «Домой» часто просто разворачивается из фона — проверяем обновление при каждом открытии
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') check(); });
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
+    navigator.serviceWorker.addEventListener('controllerchange', async () => {
       if (!hadController || shown) return;
+      // страница уже той же версии, что и новый кэш — обновлять нечего
+      try { if ((await caches.keys()).includes('dayz-guide-v' + APP_V)) return; } catch (e) { /* покажем плашку */ }
+      if (shown) return;
       shown = true;
       const bar = document.createElement('div');
       bar.className = 'upd-bar';
