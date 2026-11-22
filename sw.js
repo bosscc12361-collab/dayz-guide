@@ -3,17 +3,17 @@
    чтобы телефоны подхватили обновление.
    Страница (index.html) берётся из сети, если она есть (до 3 секунд), иначе из кэша — так онлайн всегда свежая версия.
    Данные из /data: сначала сохранённая копия, свежая скачивается в фоне. */
-const VERSION = 'v25';
+const VERSION = 'v26';
 const V = VERSION.slice(1);
 const CACHE = 'dayz-guide-' + VERSION;
 const SHELL = [
   './', 'index.html', 'css/style.css?v=' + V, 'js/app.js?v=' + V, 'js/map.js?v=' + V, 'manifest.json',
-  'data/map.json', 'data/map-vec.json', 'img/map/chernarus.jpg', 'data/symptoms.json', 'data/patches.json', 'data/quiz.json', 'data/servers.json', 'data/srv.json',
+  'data/map.json?v=' + V, 'data/map-vec.json?v=' + V, 'img/map/chernarus.jpg', 'data/symptoms.json?v=' + V, 'data/patches.json?v=' + V, 'data/quiz.json?v=' + V, 'data/servers.json?v=' + V, 'data/srv.json?v=' + V,
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'fonts/russo-cyr.woff2', 'fonts/russo-lat.woff2',
-  'data/meta.json', 'data/first15.json', 'data/food.json', 'data/diseases.json',
-  'data/injuries.json', 'data/crafting.json', 'data/fire.json', 'data/infected.json',
-  'data/weapons.json', 'data/slang.json',
-  'data/controls.json', 'data/hud.json', 'data/loadout.json', 'data/week.json', 'data/loot.json', 'data/players.json'
+  'data/meta.json?v=' + V, 'data/first15.json?v=' + V, 'data/food.json?v=' + V, 'data/diseases.json?v=' + V,
+  'data/injuries.json?v=' + V, 'data/crafting.json?v=' + V, 'data/fire.json?v=' + V, 'data/infected.json?v=' + V,
+  'data/weapons.json?v=' + V, 'data/slang.json?v=' + V,
+  'data/controls.json?v=' + V, 'data/hud.json?v=' + V, 'data/loadout.json?v=' + V, 'data/week.json?v=' + V, 'data/loot.json?v=' + V, 'data/players.json?v=' + V
 ];
 
 self.addEventListener('install', (e) => {
@@ -62,7 +62,8 @@ self.addEventListener('fetch', (e) => {
         return res;
       }).catch(() => null);
       if (cached) { e.waitUntil(network); return cached; }
-      return (await network) || Response.error();
+      // нет сети и нет точной версии — лучше прежняя копия, чем ошибка
+      return (await network) || (await cache.match(req, { ignoreSearch: true })) || Response.error();
     })
   );
 });

@@ -163,6 +163,8 @@
 
   // ---------- загрузка данных ----------
   async function getJSON(url) {
+    // версия в адресе: новый код никогда не получит данные от старой версии из кэша
+    if (/^\d+$/.test(APP_V)) url += '?v=' + APP_V;
     const r = await fetch(url, { cache: 'no-cache' });
     if (!r.ok) throw new Error(url + ': ' + r.status);
     return r.json();
