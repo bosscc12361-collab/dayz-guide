@@ -3,12 +3,12 @@
    чтобы телефоны подхватили обновление.
    Страница (index.html) берётся из сети, если она есть (до 3 секунд), иначе из кэша — так онлайн всегда свежая версия.
    Данные из /data: сначала сохранённая копия, свежая скачивается в фоне. */
-const VERSION = 'v24';
+const VERSION = 'v25';
 const V = VERSION.slice(1);
 const CACHE = 'dayz-guide-' + VERSION;
 const SHELL = [
   './', 'index.html', 'css/style.css?v=' + V, 'js/app.js?v=' + V, 'js/map.js?v=' + V, 'manifest.json',
-  'data/map.json', 'data/symptoms.json', 'data/patches.json', 'data/quiz.json', 'data/servers.json', 'data/srv.json',
+  'data/map.json', 'data/map-vec.json', 'img/map/chernarus.jpg', 'data/symptoms.json', 'data/patches.json', 'data/quiz.json', 'data/servers.json', 'data/srv.json',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'fonts/russo-cyr.woff2', 'fonts/russo-lat.woff2',
   'data/meta.json', 'data/first15.json', 'data/food.json', 'data/diseases.json',
   'data/injuries.json', 'data/crafting.json', 'data/fire.json', 'data/infected.json',

@@ -657,15 +657,6 @@ body.is-home .view { padding-top: calc(var(--sat) + 14px); }
 .srv-act .btn { width: 100%; height: 42px; font-size: 14.5px; }
 .srv-ip { font-family: ui-monospace, Menlo, monospace; font-weight: 500; color: var(--text-2); }
 
-/* ---------- карта iZurvive ---------- */
-.iz-wrap { position: relative; margin: 0 -16px; height: min(68vh, 640px); min-height: 380px; background: #0a1426; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.iz-wrap iframe { width: 100%; height: 100%; border: 0; display: block; }
-@media (min-width: 720px) { .iz-wrap { margin: 0; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); } }
-.iz-bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 8px 2px 4px; font-size: 15px; }
-.iz-bar span { font-weight: 700; }
-.iz-bar a { color: var(--bolt-light); font-size: 14px; white-space: nowrap; }
-.iz-credit { font-size: 12.5px; color: var(--text-3); margin: 2px 2px 6px; }
-.iz-credit a { color: var(--text-2); }
 .pl-tier { font-size: 13px; font-weight: 700; letter-spacing: .4px; color: var(--text-2); margin: 14px 2px 6px; }
 .pl-btn { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; text-align: left; padding: 11px 14px; margin: 0 0 6px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); color: var(--text); font-size: 15.5px; cursor: pointer; }
 .pl-btn:active { background: var(--card-2); }
@@ -673,3 +664,44 @@ body.is-home .view { padding-top: calc(var(--sat) + 14px); }
 .pl-t.t1 { background: #3ddc84; } .pl-t.t2 { background: #f0c83c; } .pl-t.t3 { background: #ff8c32; } .pl-t.t4 { background: #f04646; color: #fff; }
 .rc-steps { margin: 8px 0; }
 .rc-steps .pl-btn { padding: 8px 12px; font-size: 14.5px; }
+
+/* ---------- карта: навигация и свой маршрут ---------- */
+.map-page .map-wrap { height: min(66dvh, 720px); }
+.map-credit { font-size: 11.5px; color: var(--text-3); margin: 6px 2px 0; }
+.map-credit a { color: var(--text-2); }
+.map-ctrl button.on { background: var(--bolt); border-color: #fff; }
+.map-mode { position: absolute; left: 8px; right: 62px; bottom: 8px; z-index: 6; display: flex; align-items: center; gap: 6px; padding: 8px 8px 8px 12px; border-radius: 14px; background: rgba(10,18,38,.97); border: 1px solid rgba(95,176,255,.6); font-size: 14px; }
+.map-mode[hidden] { display: none; }
+.map-mode span { flex: 1; min-width: 0; }
+.map-mode button { height: 38px; min-width: 40px; padding: 0 12px; border-radius: 10px; border: 0; background: var(--bolt); color: #fff; font-weight: 700; font-size: 14px; cursor: pointer; }
+.map-svg.picking { cursor: crosshair; }
+.map-svg .u-line { fill: none; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+.map-svg .u-line.case { stroke: #06122b; stroke-width: 8; }
+.map-svg .u-line.own { stroke: #5fb0ff; stroke-width: 4.5; }
+.map-svg .u-line.dash { stroke: #fff; stroke-width: 3; stroke-dasharray: 8 7; }
+.map-svg .wp-c.own { fill: #2f7bff; }
+.map-svg .mk-arrow.own .arrow-p { fill: #9fd0ff; }
+.map-svg .me-halo { fill: rgba(47,123,255,.3); }
+.map-svg .me-dot { fill: #2f7bff; stroke: #fff; stroke-width: 3; }
+.map-svg .ping { fill: none; stroke: #ffe24a; stroke-width: 3.5; }
+.map-svg .mk-ping { pointer-events: none; }
+.map-svg .route { stroke-width: 4; opacity: .8; }
+.nav-box { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.nav-box label { font-size: 13px; color: var(--text-2); display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.nav-box input { width: 100%; box-sizing: border-box; height: 46px; border-radius: 12px; border: 1px solid rgba(95,176,255,.45); background: var(--card); color: var(--text); font-size: 16px; padding: 0 12px; }
+.nav-tip { font-size: 13px; color: var(--text-3); margin: 6px 2px; }
+.nav-card { background: linear-gradient(140deg, rgba(47,123,255,.18), var(--card)); border: 1px solid rgba(95,176,255,.4); border-radius: 14px; padding: 12px; }
+.nav-top { display: flex; justify-content: space-between; align-items: center; font-size: 17px; }
+.nav-dest { font-size: 16px; margin: 8px 0; }
+.nav-warn { font-size: 14.5px; margin: 6px 0; padding: 8px 10px; border-radius: 10px; background: rgba(255,140,50,.16); border: 1px solid rgba(255,140,50,.5); }
+.nav-d { flex: none; color: var(--bolt-light); font-weight: 700; font-size: 14px; }
+.nav-clear, .mine-start { width: 100%; }
+.mine-act { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.mine-act .btn { width: 100%; font-size: 14.5px; height: 44px; }
+.mine-act .btn:disabled { opacity: .45; }
+/* на общем виде — только главное, остальное при приближении */
+.map-svg:not(.lv1):not(.loot-mode) [data-layer="water"] .mk, .map-svg:not(.lv1):not(.loot-mode) .mk-clinic { display: none; }
+.map-svg:not(.lv1) .mk-police circle.police, .map-svg:not(.lv1) .mk-hospital rect.med { stroke-width: 1; }
+.map-svg.lv2:not(.has-sel-route) .route { opacity: .38; stroke-width: 3; }
+.map-svg.loot-mode .mk-town.town-big.dim { opacity: .8; }
+.map-svg.loot-mode .mk-town.town-big.dim .tl { display: block; }

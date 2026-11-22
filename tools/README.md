@@ -27,3 +27,10 @@
 
 ## «Где найти» (оружие и раздел `loot`)
 `python3 tools/gen_where.py путь/к/types.xml` — берёт официальный `db/types.xml` (Чернарусь) и пишет поля `where`, `ammo_where`, `spawn` в `data/weapons.json` и весь `data/loot.json`. Список предметов и соответствие карточек классам игры — в начале скрипта (`WEAPONS`, `LOOT`, `AMMO`).
+
+## Карта: подложка и маршруты
+Источник — официальный репозиторий DayZ-Central-Economy (см. `LICENSE-DATA.md`). Скачать в одну папку `CETool/ChernarusPlus/map.png`, `layers/water-sea.tga`, `layers/water-fresh.tga`, `dayzOffline.chernarusplus/mapgroupcluster*.xml`, затем:
+- `python3 tools/gen_base.py ПАПКА tools/tga.py` — подложка, реки, рельсы, тропы (`map.png` → `chernarus.jpg`, `vec.json`);
+- `python3 tools/gen_paths.py ПАПКА data/map.json tools/tga.py tools/route_via.json` — маршруты по дорогам (`paths.json`); ручные точки маршрута — в `route_via.json`;
+- `python3 tools/gen_rails.py ПАПКА tools/tga.py` — сшивает рельсы в линии.
+`gen_map.py` создаёт `map.json` без `path`, `background` и `danger`: после него маршруты и эти поля нужно добавить снова.

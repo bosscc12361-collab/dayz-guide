@@ -329,7 +329,7 @@
       ]
     }
   ],
-  "sources": "dayz.wiki.gg, официальные патчноуты Bohemia Interactive; карта и «где найти» — официальные данные DayZ Central Economy (github.com/BohemiaInteractive)",
+  "sources": "dayz.wiki.gg, официальные патчноуты Bohemia Interactive. Карта и «где найти» сделаны из DayZ Central Economy (github.com/BohemiaInteractive/DayZ-Central-Economy), © Bohemia Interactive, лицензия ADPL-SA: только некоммерческое использование. Данные мы изменили: осветлили карту, выбрали точки, перевели и сгруппировали. Подробности: файл LICENSE-DATA.md в репозитории сайта.",
   "feedback": {
     "endpoint": "https://dayz-feedback.boss-c-c12361.workers.dev"
   },

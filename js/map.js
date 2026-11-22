@@ -12,10 +12,13 @@
     { id: 'police', title: 'Полиция', icon: '🚓', on: true },
     { id: 'military', title: 'Военные', icon: '🎖️', on: true },
     { id: 'gas', title: 'Газ', icon: '☣️', on: true },
+    { id: 'danger', title: 'Опасно', icon: '⚠️', on: true },
     { id: 'spawn', title: 'Спавн', icon: '🟢', on: true },
     { id: 'routes', title: 'Маршруты', icon: '🧭', on: true },
     { id: 'tiers', title: 'Зоны лута', icon: '🎯', on: false },
-    { id: 'hunting', title: 'Вышки', icon: '🦌', on: false }
+    { id: 'hunting', title: 'Вышки', icon: '🦌', on: false },
+    { id: 'rails', title: 'Рельсы и тропы', icon: '🛤️', on: true },
+    { id: 'buildings', title: 'Дома', icon: '🏠', on: true }
   ];
   const BCOL = { Military: '#d4ab2c', Police: '#4a7bff', Medic: '#ff5f5f', Firefighter: '#ff8a3d', Prison: '#a46bd1', Hunting: '#b58f5c',
     Industrial: '#66788f', Farm: '#8c7350', Office: '#8aa6cf', School: '#79b8c9', Town: '#b5c3da', Village: '#97a7bf', Coast: '#5fa8a0', Other: '#8494ad' };
@@ -34,6 +37,7 @@
     spawn: { t: 'Зона спавна', i: '🟢', d: 'Здесь появляются свежие игроки. Вокруг много кепок, и всё уже обыскано — уходи вглубь.', link: ['#first15/fresh-spawn', 'Чек-лист спавна'] }
   };
 
+  let V = null, me = null, dest = null, mine = [], mode = null, onState = null; // векторные слои, «я здесь», цель, свой маршрут
   let lootF = null; // фильтр «где найти»: { usage:[], tiers:Set }
   let D = null, B = null, svg, canvas, ctx, wrap, sheet, tip, vb, layersOn = {}, onNavigate = null, raf = 0, dpr = 1, bg = null;
   const Y = (z) => D.size - z;
@@ -48,13 +52,15 @@
     return D.towns.find((t) => t.id === id) || D.military.find((m) => m.id === id) || D.zones.find((z) => z.id === id) || null;
   }
 
+  const routePts = (r) => (r.path && r.path.length > 1 ? r.path : r.wp.map(place).filter(Boolean).map((p) => [p.x, p.z]));
+
   // ---------- SVG: метки, подписи, маршруты ----------
   function buildSVG() {
     svg = el('svg', { class: 'map-svg', role: 'img', 'aria-label': 'Схема карты Чернаруси' });
 
     const gRoutes = el('g', { 'data-layer': 'routes' }, svg);
     D.routes.forEach((r) => {
-      const pts = r.wp.map(place).filter(Boolean).map((p) => p.x + ',' + Y(p.z)).join(' ');
+      const pts = routePts(r).map((p) => p[0] + ',' + Y(p[1])).join(' ');
       el('polyline', { points: pts, class: 'route-hit', 'data-id': r.id }, gRoutes);
       el('polyline', { points: pts, class: 'route ' + r.verdict, 'data-id': r.id }, gRoutes);
     });
@@ -83,7 +89,9 @@
         '<text class="tl' + (t.big ? ' big' : '') + '" y="' + (t.big ? -8 : -6) + '">' + esc(t.name) + '</text>');
       node.classList.add(t.big ? 'town-big' : 'town-small');
     });
+    el('g', { class: 'user-layer' }, svg);
     applyLayers();
+    drawUser();
   }
 
   function mk(parent, x, z, id, kind, inner, extraStyle) {
@@ -110,6 +118,7 @@
     if (bg && bg.complete && bg.naturalWidth) {
       const b = D.background;
       ctx.globalAlpha = b.opacity || 1;
+      ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(bg, sx(b.x0), sy(b.z1), (b.x1 - b.x0) * k, (b.z1 - b.z0) * k);
       ctx.globalAlpha = 1;
     } else {
@@ -117,6 +126,23 @@
       ctx.fillStyle = '#132339'; ctx.strokeStyle = '#3b6fb8'; ctx.lineWidth = 1.5 * dpr;
       poly(D.coast); ctx.fill(); ctx.stroke();
       D.islands.forEach((isl) => { poly(isl); ctx.fill(); ctx.stroke(); });
+    }
+
+    // реки, тропы, рельсы
+    const inV = (x, z) => x > vb.x - 50 && x < vb.x + vb.w + 50 && Y(z) > vb.y - 50 && Y(z) < vb.y + vb.h + 50;
+    if (V) {
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.strokeStyle = 'rgba(96,178,255,.85)'; ctx.lineWidth = Math.max(1.2 * dpr, 14 * k);
+      V.rivers.forEach((l) => { ctx.beginPath(); l.forEach((q, i) => (i ? ctx.lineTo(sx(q[0]), sy(q[1])) : ctx.moveTo(sx(q[0]), sy(q[1])))); ctx.stroke(); });
+      if (layersOn.rails) {
+        if (k > 0.05 * dpr) {
+          ctx.fillStyle = 'rgba(255,214,150,.8)'; const t = Math.max(1.3 * dpr, 3 * k);
+          V.paths.forEach((q) => { if (inV(q[0], q[1])) ctx.fillRect(sx(q[0]) - t / 2, sy(q[1]) - t / 2, t, t); });
+        }
+        const seg = () => { ctx.beginPath(); V.rails.forEach((q) => { if (inV(q[0], q[1]) || inV(q[2], q[3])) { ctx.moveTo(sx(q[0]), sy(q[1])); ctx.lineTo(sx(q[2]), sy(q[3])); } }); ctx.stroke(); };
+        ctx.strokeStyle = '#141a28'; ctx.lineWidth = Math.max(2 * dpr, 7 * k); seg();
+        if (k > 0.06 * dpr) { ctx.setLineDash([5 * dpr, 4 * dpr]); ctx.lineCap = 'butt'; ctx.strokeStyle = '#e9eefb'; ctx.lineWidth = Math.max(dpr, 3.5 * k); seg(); ctx.setLineDash([]); }
+      }
     }
 
     // сетка 1 км
@@ -149,11 +175,20 @@
       });
     }
 
+    // круги опасности вокруг военки (примерно)
+    if (layersOn.danger) {
+      D.military.forEach((m) => {
+        ctx.beginPath(); ctx.arc(sx(m.x), sy(m.z), (m.danger || 400) * k, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,170,40,.16)'; ctx.fill();
+        ctx.setLineDash([7 * dpr, 5 * dpr]); ctx.strokeStyle = 'rgba(255,186,70,.95)'; ctx.lineWidth = 1.6 * dpr; ctx.stroke(); ctx.setLineDash([]);
+      });
+    }
+
     // здания (по точкам лута из официальных данных)
-    if (layersOn.buildings && B) {
+    if (layersOn.buildings && B && k > 0.1 * dpr) {
       const minPx = 2.2 * dpr;
       const x0 = vb.x - 80, x1 = vb.x + vb.w + 80, y0 = vb.y - 80, y1 = vb.y + vb.h + 80;
-      const zoomed = k > 0.12 * dpr;
+      const zoomed = true;
       for (let i = 0; i < B.b.length; i++) {
         const b = B.b[i];
         const yy = D.size - b[1];
@@ -166,7 +201,7 @@
         ctx.translate(px, py);
         ctx.rotate(b[2] * Math.PI / 180);
         const w = Math.max(minPx, ty[1] * k), h = Math.max(minPx, ty[2] * k);
-        ctx.globalAlpha = .9;
+        ctx.globalAlpha = .88;
         ctx.fillRect(ty[4] * k - w / 2, -ty[5] * k - h / 2, w, h);
         ctx.restore();
       }
@@ -179,7 +214,7 @@
   function setVB(nx, ny, nw) {
     const r = wrap.getBoundingClientRect();
     const aspect = (r.height || 1) / (r.width || 1);
-    nw = Math.max(500, Math.min(nw, D.size * 1.15));
+    nw = Math.max(700, Math.min(nw, D.size * 1.15));
     const nh = nw * aspect;
     const pad = nw * 0.4;
     const clamp = (v, a, b) => Math.max(Math.min(a, b), Math.min(v, Math.max(a, b)));
@@ -216,8 +251,9 @@
   }
   function fitAll() {
     const r = wrap.getBoundingClientRect();
-    const w = 11000, h = w * (r.height / r.width);
-    setVB(4600, Y(1200) - h, w);
+    const a = (r.height / r.width) || 1;
+    const w = Math.min(D.size, D.size / a);
+    setVB(Math.max(0, D.size - w - 1300), a >= 1 ? 0 : D.size - w * a, w);
   }
 
   // ---------- жесты ----------
@@ -265,7 +301,8 @@
         if (!moved) {
           const now = Date.now();
           const t = target(downTarget);
-          if (t) select(t.getAttribute('data-id'), true);
+          if (mode) { const g = toGame(e.clientX, e.clientY); if (mode === 'me') setMe({ x: g[0], z: g[1], name: 'метка на карте' }); else { mine.push(g); saveMine(); drawUser(); } }
+          else if (t) select(t.getAttribute('data-id'), true);
           else if (now - lastTap < 320) zoomAt(e.clientX, e.clientY, 2);
           else hideTip(true);
           lastTap = now;
@@ -297,7 +334,7 @@
   function setLoot(f) {
     lootF = f ? { usage: f.usage || [], tiers: new Set(f.tiers || []) } : null;
     if (lootF) {
-      LAYERS.forEach((l) => { layersOn[l.id] = false; });
+      LAYERS.forEach((l) => { layersOn[l.id] = ['danger', 'gas', 'rails', 'buildings'].includes(l.id); });
       lootF.usage.forEach((u) => { if (USAGE_LAYER[u]) layersOn[USAGE_LAYER[u]] = true; });
       layersOn.tiers = lootF.tiers.size > 0;
     } else LAYERS.forEach((l) => { layersOn[l.id] = l.on; });
@@ -320,6 +357,68 @@
   function applyLayers() {
     svg.querySelectorAll('[data-layer]').forEach((g) => { g.style.display = layersOn[g.getAttribute('data-layer')] ? '' : 'none'; });
     requestDraw();
+  }
+
+  // ---------- «я здесь», цель и свой маршрут ----------
+  const LS = { get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* нет места */ } } };
+  const dist = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
+  const DIRS = ['С', 'СВ', 'В', 'ЮВ', 'Ю', 'ЮЗ', 'З', 'СЗ'];
+  function bearing(a, b) { const d = (Math.atan2(b.x - a.x, b.z - a.z) * 180 / Math.PI + 360) % 360; return { deg: Math.round(d) % 360, dir: DIRS[Math.round(d / 45) % 8] }; }
+  function toGame(cx, cy) { const r = wrap.getBoundingClientRect(); return [Math.round(vb.x + (cx - r.left) / r.width * vb.w), Math.round(D.size - (vb.y + (cy - r.top) / r.height * vb.h))]; }
+  function arrowsAlong(p) {
+    let total = 0; for (let i = 1; i < p.length; i++) total += Math.hypot(p[i][0] - p[i - 1][0], p[i][1] - p[i - 1][1]);
+    const n = Math.max(1, Math.min(8, Math.round(total / 1100))), out = []; let next = total / (n + 1), acc = 0;
+    for (let i = 1; i < p.length; i++) {
+      const L = Math.hypot(p[i][0] - p[i - 1][0], p[i][1] - p[i - 1][1]);
+      while (L && acc + L >= next && out.length < n) {
+        const t = (next - acc) / L;
+        out.push([p[i - 1][0] + (p[i][0] - p[i - 1][0]) * t, p[i - 1][1] + (p[i][1] - p[i - 1][1]) * t, Math.atan2(-(p[i][1] - p[i - 1][1]), p[i][0] - p[i - 1][0]) * 180 / Math.PI]);
+        next += total / (n + 1);
+      }
+      acc += L;
+    }
+    return out;
+  }
+  const dangers = () => D.military.map((m) => ({ x: m.x, z: m.z, r: m.danger || 400, name: m.name, kind: 'mil' })).concat(D.zones.map((z) => ({ x: z.x, z: z.z, r: z.r, name: z.name, kind: 'gas' })));
+  function segDist(p, a, b) { const dx = b.x - a.x, dz = b.z - a.z, L = dx * dx + dz * dz; const t = L ? Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.z - a.z) * dz) / L)) : 0; return Math.hypot(p.x - a.x - t * dx, p.z - a.z - t * dz); }
+  // какие опасные зоны пересекает ломаная
+  function dangersOn(line) {
+    const pts = line.map((q) => ({ x: q[0], z: q[1] }));
+    return dangers().filter((d) => pts.length === 1 ? dist(d, pts[0]) <= d.r + 100 : pts.some((q, i) => i && segDist(d, pts[i - 1], q) <= d.r + 100));
+  }
+  function lineKm(p) { let t = 0; for (let i = 1; i < p.length; i++) t += Math.hypot(p[i][0] - p[i - 1][0], p[i][1] - p[i - 1][1]); return t / 1000; }
+  function saveMine() { LS.set('dz_my_route', mine); }
+  function drawUser() {
+    if (!svg) return;
+    const g = svg.querySelector('.user-layer'); if (!g) return; g.innerHTML = '';
+    if (me && dest) el('polyline', { points: me.x + ',' + Y(me.z) + ' ' + dest.x + ',' + Y(dest.z), class: 'u-line dash' }, g);
+    if (mine.length > 1) {
+      const pts = mine.map((q) => q[0] + ',' + Y(q[1])).join(' ');
+      el('polyline', { points: pts, class: 'u-line case' }, g); el('polyline', { points: pts, class: 'u-line own' }, g);
+      arrowsAlong(mine).forEach((q) => mk(g, q[0], q[1], '', 'arrow own', '<path d="M-6 -6 L6 0 L-6 6 Z" class="arrow-p"/>', ';--r:' + q[2] + 'deg'));
+    }
+    mine.forEach((q, i) => mk(g, q[0], q[1], '', 'wp', '<circle r="7" class="wp-c own"/><text class="wp-t" y="3.3">' + (i + 1) + '</text>'));
+    if (dest) mk(g, dest.x, dest.z, '', 'flag', '<circle r="11" class="flag-c good"/><text class="ico" y="5">🏁</text>');
+    if (me) mk(g, me.x, me.z, '', 'flag', '<circle r="16" class="me-halo"/><circle r="8" class="me-dot"/><text class="flag-t" y="-20">Я ЗДЕСЬ</text>');
+    if (onState) onState({ me, dest, mine: mine.slice(), mode });
+  }
+  function setMe(p) { me = p; if (p) { LS.set('dz_me', p); if (mode === 'me') mode = null; } else LS.set('dz_me', null); drawUser(); }
+  function setDest(p) { dest = p; drawUser(); if (me && dest) fitPts([[me.x, me.z], [dest.x, dest.z]]); }
+  function setMode(m) { mode = m; hideTip(true); svg.classList.toggle('picking', !!m); drawUser(); }
+  function fitPts(p) {
+    const xs = p.map((q) => q[0]), zs = p.map((q) => q[1]), r = wrap.getBoundingClientRect(), a = r.height / r.width;
+    const w = Math.max((Math.max(...xs) - Math.min(...xs)) * 1.5, (Math.max(...zs) - Math.min(...zs)) * 1.5 / a, 2200);
+    setVB((Math.max(...xs) + Math.min(...xs)) / 2 - w / 2, Y((Math.max(...zs) + Math.min(...zs)) / 2) - w * a / 2, w);
+  }
+  // что рядом с точкой
+  function around(p) {
+    const near = (list, f) => list.map(f).map((q) => ({ ...q, d: dist(p, q), b: bearing(p, q) })).sort((a, b) => a.d - b.d)[0];
+    const pt = (q) => ({ x: q[0], z: q[1], name: q[2] });
+    return {
+      town: near(D.towns, (t) => ({ x: t.x, z: t.z, name: t.name })), water: near(D.points.water, pt),
+      medical: near(D.points.hospital.concat(D.points.clinic), pt), police: near(D.points.police, pt),
+      danger: dangers().map((d) => ({ ...d, d: dist(p, d) - d.r, b: bearing(p, d) })).sort((a, b) => a.d - b.d)[0], tier: tierAt(p.x, p.z)
+    };
   }
 
   // ---------- описание объекта ----------
@@ -437,18 +536,16 @@
     // оформление: старт, финиш, номера точек, стрелки направления
     const deco = svg.querySelector('.route-deco'); deco.innerHTML = '';
     const col = r.verdict === 'good' ? 'good' : 'bad';
-    for (let i = 0; i < pts.length - 1; i++) {
-      const a = pts[i], b = pts[i + 1];
-      const ang = Math.atan2(Y(b.z) - Y(a.z), b.x - a.x) * 180 / Math.PI;
-      mk(deco, a.x + (b.x - a.x) * 0.5, a.z + (b.z - a.z) * 0.5, '', 'arrow ' + col, '<path d="M-6 -6 L6 0 L-6 6 Z" class="arrow-p"/>', ';--r:' + ang + 'deg');
-    }
+    const line = routePts(r);
+    arrowsAlong(line).forEach((q) => mk(deco, q[0], q[1], '', 'arrow ' + col, '<path d="M-6 -6 L6 0 L-6 6 Z" class="arrow-p"/>', ';--r:' + q[2] + 'deg'));
+    if (pts.length) pts[0] = { x: line[0][0], z: line[0][1] };
     pts.forEach((p, i) => {
       if (i === 0) mk(deco, p.x, p.z, '', 'flag', '<circle r="11" class="flag-c start"/><path d="M-3 -5 L5 0 L-3 5 Z" fill="#fff"/><text class="flag-t" y="-17">СТАРТ</text>');
       else if (i === pts.length - 1) mk(deco, p.x, p.z, '', 'flag', '<circle r="12" class="flag-c ' + col + '"/><text class="ico" y="5">🏁</text><text class="flag-t" y="-18">ФИНИШ</text>');
       else mk(deco, p.x, p.z, '', 'wp', '<circle r="8" class="wp-c ' + col + '"/><text class="wp-t" y="3.5">' + i + '</text>');
     });
     // весь маршрут — в видимой части (снизу свёрнутая панель)
-    const xs = pts.map((p) => p.x), zs = pts.map((p) => p.z);
+    const xs = line.map((p) => p[0]), zs = line.map((p) => p[1]);
     const minx = Math.min(...xs), maxx = Math.max(...xs), minz = Math.min(...zs), maxz = Math.max(...zs);
     const rr = wrap.getBoundingClientRect(), aspect = rr.height / rr.width;
     const usable = 0.74;
@@ -493,14 +590,25 @@
       '<div><span class="lg-i lg-hunt">▲</span>Охотничья вышка</div><div><span class="lg-i">🏁</span>Финиш маршрута</div></div>' +
       '<div class="lg-title">Зоны лута (слой 🎯)</div><div class="lg-grid">' +
       [1, 2, 3, 4].map((t) => '<div>' + b(TSOLID[t], 'Tier ' + t) + '</div>').join('') + '</div>' +
-      '<p class="lg-note">Чем дальше от побережья на северо-запад, тем выше тир и лучше лут. Дорог на схеме пока нет.</p>';
+      '<div class="lg-title">Линии</div><div class="lg-grid"><div>' + b('#1b2233', 'Железная дорога') + '</div><div>' + b('#ffd696', 'Тропа') + '</div><div>' + b('#60b2ff', 'Река') + '</div><div>' + b('rgba(255,170,40,.5)', 'Опасно: военка') + '</div></div>' +
+      '<p class="lg-note">Чем дальше от побережья на северо-запад, тем выше тир и лучше лут. Оранжевые круги — примерная зона, где у военки часто стреляют: радиус мы задали сами. Реки показаны не все.</p>';
   }
 
   // ---------- публичный API ----------
   window.DZMap = {
     LAYERS, routeHTML, lootHTML,
-    mount(container, data, buildings, focusId, navCb, loot) {
-      D = data; B = buildings; onNavigate = navCb || null;
+    bearing, dangersOn, lineKm, around, dist,
+    setMe, setDest, setMode,
+    getState: () => ({ me, dest, mine: mine.slice(), mode }),
+    undo() { mine.pop(); saveMine(); drawUser(); },
+    clearMine() { mine = []; saveMine(); drawUser(); },
+    setMine(p) { mine = p; saveMine(); drawUser(); if (p.length > 1) fitPts(p); },
+    fitMine() { if (mine.length > 1) fitPts(mine); },
+    flyTo(x, z, w) { hideTip(true); centerOn(x, z, w || 2600, 0.5); const g = svg.querySelector('.user-layer'); const o = g.querySelector('.mk-ping'); if (o) o.remove(); mk(g, x, z, '', 'ping', '<circle r="14" class="ping"/>'); },
+    setVectors(v) { V = v; B = v.houses; requestDraw(); },
+    mount(container, data, focusId, navCb, loot, stateCb) {
+      D = data; onNavigate = navCb || null; onState = stateCb || null; mode = null; dest = null;
+      me = LS.get('dz_me', null); mine = LS.get('dz_my_route', []); if (!Array.isArray(mine)) mine = [];
       if (!Object.keys(layersOn).length) LAYERS.forEach((l) => { layersOn[l.id] = l.on; });
       wrap = container.querySelector('.map-wrap');
       sheet = container.querySelector('.map-sheet');
@@ -534,7 +642,6 @@
       }, 0);
       window.addEventListener('resize', onResize);
     },
-    setBuildings(b) { B = b; requestDraw(); },
     setLoot(f) { setLoot(f); requestDraw(); },
     select(id) {
       if (!svg) return;
