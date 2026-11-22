@@ -75,6 +75,7 @@
   };
 
   let pendingFocus = null, PO = null, tiles = new Map(), tileQ = 0; // метки и подробные плитки
+  let plans = [], planSel = null, onPlan = null;
   let V = null, me = null, dest = null, mine = [], mode = null, onState = null; // векторные слои, «я здесь», цель, свой маршрут
   let lootF = null; // фильтр «где найти»: { usage:[], tiers:Set }
   let D = null, B = null, svg, canvas, ctx, wrap, sheet, tip, vb, layersOn = {}, onNavigate = null, raf = 0, dpr = 1, bg = null;
@@ -453,7 +454,7 @@
         if (!moved) {
           const now = Date.now();
           const t = target(downTarget);
-          if (mode) { const g = toGame(e.clientX, e.clientY); if (mode === 'me') setMe({ x: g[0], z: g[1], name: 'метка на карте' }); else { mine.push(g); saveMine(); drawUser(); } }
+          if (mode) { const g = toGame(e.clientX, e.clientY); if (mode === 'me') setMe({ x: g[0], z: g[1], name: 'Точка на карте' }); else if (mode === 'dest') { mode = null; svg.classList.remove('picking'); setDest({ x: g[0], z: g[1], name: 'Точка на карте' }); } else { mine.push(g); saveMine(); drawUser(); } }
           else if (t) select(t.getAttribute('data-id'), true);
           else if (tapEvent(e.clientX, e.clientY)) { /* показали подсказку */ }
           else if (now - lastTap < 320) zoomAt(e.clientX, e.clientY, 2);
@@ -544,7 +545,17 @@
   function drawUser() {
     if (!svg) return;
     const g = svg.querySelector('.user-layer'); if (!g) return; g.innerHTML = '';
-    if (me && dest) el('polyline', { points: me.x + ',' + Y(me.z) + ' ' + dest.x + ',' + Y(dest.z), class: 'u-line dash' }, g);
+    if (me && dest && !plans.length) el('polyline', { points: me.x + ',' + Y(me.z) + ' ' + dest.x + ',' + Y(dest.z), class: 'u-line dash' }, g);
+    plans.slice().sort((a, b) => (a.id === planSel) - (b.id === planSel)).forEach((r) => {
+      const pts = r.path.map((q) => q[0] + ',' + Y(q[1])).join(' '), on = r.id === planSel;
+      el('polyline', { points: pts, class: 'u-line case' + (on ? ' on' : '') }, g);
+      el('polyline', { points: pts, class: 'u-line plan ' + r.id + (on ? ' on' : '') }, g);
+      el('polyline', { points: pts, class: 'plan-hit', 'data-id': 'plan-' + r.id }, g);
+      if (on) {
+        arrowsAlong(r.path).forEach((q) => mk(g, q[0], q[1], '', 'arrow own', '<path d="M-6 -6 L6 0 L-6 6 Z" class="arrow-p"/>', ';--r:' + q[2] + 'deg'));
+        r.stops.forEach((q, i) => mk(g, q.x, q.z, '', 'wp', '<circle r="9" class="wp-c stop"/><text class="wp-t" y="3.4">' + (i + 1) + '</text>'));
+      }
+    });
     if (mine.length > 1) {
       const pts = mine.map((q) => q[0] + ',' + Y(q[1])).join(' ');
       el('polyline', { points: pts, class: 'u-line case' }, g); el('polyline', { points: pts, class: 'u-line own' }, g);
@@ -555,8 +566,9 @@
     if (me) mk(g, me.x, me.z, '', 'flag', '<circle r="16" class="me-halo"/><circle r="8" class="me-dot"/><text class="flag-t" y="-20">Я ЗДЕСЬ</text>');
     if (onState) onState({ me, dest, mine: mine.slice(), mode });
   }
-  function setMe(p) { me = p; if (p) { LS.set('dz_me', p); if (mode === 'me') mode = null; } else LS.set('dz_me', null); drawUser(); }
+  function setMe(p) { me = p; LS.set('dz_me', p); if (p && mode === 'me') { mode = null; svg.classList.remove('picking'); } drawUser(); }
   function setDest(p) { dest = p; drawUser(); if (me && dest) fitPts([[me.x, me.z], [dest.x, dest.z]]); }
+  function setPlans(list, sel, fit) { plans = list || []; planSel = sel || (plans[0] && plans[0].id) || null; if (svg) svg.classList.toggle('has-plan', plans.length > 0); drawUser(); if (fit && plans.length) fitPts(plans.reduce((a, r) => a.concat(r.path), [])); }
   function setMode(m) { mode = m; hideTip(true); svg.classList.toggle('picking', !!m); drawUser(); }
   function fitPts(p) {
     const xs = p.map((q) => q[0]), zs = p.map((q) => q[1]), r = wrap.getBoundingClientRect(), a = r.height / r.width;
@@ -624,7 +636,8 @@
 
   // подсказка при наведении (ПК) и закреплённая подсказка по тапу
   function showHover(id, cx, cy) {
-    if (id.startsWith('r-')) { const r = D.routes.find((x) => x.id === id); if (!r) return; renderTip({ icon: r.verdict === 'good' ? '✅' : '❌', title: r.title, sub: 'нажми, чтобы показать маршрут' }, false); }
+    if (id.startsWith('plan-')) { const r = plans.find((x) => x.id === id.slice(5)); if (!r) return; renderTip({ icon: r.icon, title: r.title, sub: r.km.toFixed(1).replace('.', ',') + ' км' }, false); }
+    else if (id.startsWith('r-')) { const r = D.routes.find((x) => x.id === id); if (!r) return; renderTip({ icon: r.verdict === 'good' ? '✅' : '❌', title: r.title, sub: 'нажми, чтобы показать маршрут' }, false); }
     else { const d = info(id); if (!d) return; renderTip({ icon: d.icon, title: d.title, sub: d.sub }, false); }
     const r = wrap.getBoundingClientRect();
     placeTip(cx - r.left, cy - r.top);
@@ -669,6 +682,7 @@
   }
 
   function select(id, fromTap) {
+    if (id.startsWith('plan-')) { planSel = id.slice(5); drawUser(); if (onPlan) onPlan(planSel); return; }
     if (id.startsWith('r-')) return selectRoute(id);
     const d = info(id); if (!d) return;
     svg.querySelectorAll('.mk.sel').forEach((n) => n.classList.remove('sel'));
@@ -772,7 +786,8 @@
   window.DZMap = {
     LAYERS, routeHTML, lootHTML,
     bearing, dangersOn, lineKm, around, dist,
-    setMe, setDest, setMode,
+    setMe, setDest, setMode, setPlans, dangers, tierAt,
+    set onPlan(f) { onPlan = f; },
     getState: () => ({ me, dest, mine: mine.slice(), mode }),
     undo() { mine.pop(); saveMine(); drawUser(); },
     clearMine() { mine = []; saveMine(); drawUser(); },
@@ -783,7 +798,7 @@
     tileList: () => { const b = D && D.background; if (!b || !b.tiles) return []; const sk = new Set((b.skip || []).map((q) => q.join('_'))), o = []; for (let y = 0; y < b.grid; y++) for (let x = 0; x < b.grid; x++) if (!sk.has(x + '_' + y)) o.push(b.tiles + x + '_' + y + '.webp'); return o; },
     setVectors(v) { V = v; B = v.houses; requestDraw(); },
     mount(container, data, focusId, navCb, loot, stateCb) {
-      D = data; onNavigate = navCb || null; onState = stateCb || null; mode = null; dest = null;
+      D = data; onNavigate = navCb || null; onState = stateCb || null; mode = null; dest = null; plans = []; planSel = null;
       me = LS.get('dz_me', null); mine = LS.get('dz_my_route', []); if (!Array.isArray(mine)) mine = [];
       if (!Object.keys(layersOn).length) LAYERS.forEach((l) => { layersOn[l.id] = l.on; });
       wrap = container.querySelector('.map-wrap');

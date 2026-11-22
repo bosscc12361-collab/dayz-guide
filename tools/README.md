@@ -40,3 +40,4 @@
 - `python3 tools/gen_detail.py ПАПКА tools/tga.py ВЫХОД` — подробные плитки 512 px (16×16); плитки, целиком состоящие из моря, пропускаются (`skip.json` → `background.skip`);
 - `python3 tools/gen_poi.py ПАПКА data/map.json` — `data/map-poi.json` (нужны ещё `mapgroupproto.xml`, `cfgeventspawns.xml` и `names.json` с названиями мест из конфигурации игры).
 Если плитки меняются, переименуй кэш `dayz-tiles-1` в `sw.js` и `app.js`, иначе телефоны оставят старые.
+- `python3 tools/gen_grid.py ПАПКА tools/tga.py` — `data/map-grid.json`, сетка проходимости для навигатора (`js/nav.js`).

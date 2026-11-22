@@ -310,7 +310,7 @@
       '<span class="t-ico">' + ico + '</span>' +
       '<span><span class="t-title">' + esc(title) + '</span><br><span class="t-short">' + esc(short) + '</span></span>' +
       (count != null ? '<span class="t-count">' + count + '</span>' : '') + '</a>';
-    if (id === 'map') return state.map ? tile('#map', '🗺️', 'Карта Чернаруси', 'Где я, куда идти, опасные места, лут и свой маршрут', 'wide map-tile') : '';
+    if (id === 'map') return state.map ? tile('#map', '🗺️', 'Карта Чернаруси', 'Навигатор: напиши, где ты, — покажу, куда и как идти', 'wide map-tile') : '';
     if (id === 'help') return state.symptoms ? tile('#help', '🩺', 'Что со мной?', 'Выбери симптомы — подскажу, что это', 'tool-tile') : '';
     if (id === 'patch') { if (!state.patches) return ''; const v = state.patches.patches[0]; return tile('#patch', '🆕', 'Что нового в ' + v.version, 'Главное из патча для новичка', 'tool-tile'); }
     if (id === 'quiz') return state.quiz ? tile('#quiz', '🧠', 'Проверь себя', 'Какой у тебя уровень в DayZ?', 'tool-tile') : '';
@@ -695,12 +695,12 @@
 
   function viewMap(focusId, params) {
     setChrome('Карта Чернаруси', null, true);
-    const DM = window.DZMap;
+    const DM = window.DZMap, NAV = window.DZNav;
     if (!state.map || !DM) { $view.innerHTML = '<div class="empty">Не удалось загрузить карту. Проверь интернет и обнови страницу.</div>'; return; }
     const M = state.map;
-    const lootRef = params ? params.get('loot') : null;
-    const shared = params ? params.get('my') : null;
-    const findTown = (v) => { const q = norm(v || '').trim(); if (!q) return null; return M.towns.find((t) => norm(t.name) === q || norm(t.en || '') === q) || M.towns.find((t) => norm(t.name).startsWith(q) || norm(t.en || '').startsWith(q)) || null; };
+    const lootRef = params ? params.get('loot') : null, shared = params ? params.get('my') : null;
+    const pt = (v) => { const a = (v || '').split('.').map((n) => +n * 10); return a.length === 2 && a.every((n) => n >= 0 && n <= M.size) && v ? a : null; };
+    const pFrom = params && pt(params.get('from')), pTo = params && pt(params.get('to'));
     const chips = DM.LAYERS.map((l) => '<button class="chip" data-layer-toggle="' + l.id + '">' + l.icon + ' ' + esc(l.title) + '</button>').join('');
     const opts = (() => {
       const groups = {};
@@ -708,79 +708,175 @@
       return Object.keys(groups).map((g) => '<optgroup label="' + g + '">' + groups[g].sort((a, b) => a[1].title.localeCompare(b[1].title, 'ru'))
         .map(([sec, it]) => { const v = sec.id + '/' + it.id; return '<option value="' + esc(v) + '"' + (v === lootRef ? ' selected' : '') + '>' + esc(it.title) + '</option>'; }).join('') + '</optgroup>').join('');
     })();
-    const towns = M.towns.slice().sort((a, b) => a.name.localeCompare(b.name, 'ru'));
-    const card = (r) => '<div class="route-card ' + r.verdict + '"><div class="rc-title">' + (r.verdict === 'good' ? '✅ ' : '❌ ') + esc(r.title) + '</div>' +
-      DM.routeHTML(r) + '<button class="btn" data-route="' + esc(r.id) + '">🧭 Показать на карте</button></div>';
+    const ready = (r) => '<details class="rt ' + r.verdict + '"><summary><span class="rt-i">' + (r.verdict === 'good' ? '✅' : '❌') + '</span><span class="rt-t">' + esc(r.title) + '</span><span class="rt-k">' + String(r.stats.km).replace('.', ',') + ' км</span></summary>' +
+      '<div class="rt-b"><button class="btn" data-route="' + esc(r.id) + '">🗺️ Показать на карте</button>' + DM.routeHTML(r) + '</div></details>';
+    const tabs = [['way', '🧭', 'Маршрут'], ['loot', '🔎', 'Предмет'], ['mine', '✏️', 'Свой'], ['ready', '📚', 'Готовые']];
+    const startTab = lootRef ? 'loot' : 'way';
     $view.innerHTML = '<div class="map-page">' +
+      '<div class="pl-box"><div class="pl-rows">' +
+        '<div class="pl-row"><span class="pl-dot from"></span><input id="plFrom" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search" placeholder="Где ты? Город с таблички…" aria-label="Откуда"><button class="pl-ic" data-x="from" hidden aria-label="Очистить">✕</button><button class="pl-ic" data-pick="me" aria-label="Указать на карте, где я">📍</button></div>' +
+        '<div class="pl-row"><span class="pl-dot to"></span><input id="plTo" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search" placeholder="Куда идёшь? Можно не указывать" aria-label="Куда"><button class="pl-ic" data-x="to" hidden aria-label="Очистить">✕</button><button class="pl-ic" data-pick="dest" aria-label="Указать цель на карте">🎯</button></div>' +
+        '</div><button class="pl-swap" aria-label="Поменять местами">⇅</button><div class="pl-sug" hidden></div></div>' +
       '<div class="map-wrap"><div class="map-ctrl">' +
-        '<button data-zoom="layers" aria-label="Слои карты">☰</button>' +
-        '<button data-zoom="in" aria-label="Приблизить">+</button><button data-zoom="out" aria-label="Отдалить">−</button>' +
+        '<button data-zoom="layers" aria-label="Слои карты">☰</button><button data-zoom="in" aria-label="Приблизить">+</button><button data-zoom="out" aria-label="Отдалить">−</button>' +
         '<button data-zoom="fit" aria-label="Вся карта">⤢</button><button data-zoom="legend" aria-label="Обозначения">?</button>' +
-        '<button data-mode="me" aria-label="Отметить, где я">📍</button><button data-mode="draw" aria-label="Нарисовать маршрут">✏️</button>' +
-      '</div><div class="map-pop" hidden><button class="tip-close" aria-label="Закрыть">×</button><div class="lg-title">Что показывать</div><div class="pop-grid">' + chips + '</div><button class="btn pop-save" data-save>⬇️ Сохранить подробную карту офлайн (7 МБ)</button></div><div class="map-mode" hidden></div><div class="map-tip" hidden></div><div class="map-legend" hidden></div><div class="map-sheet" hidden></div></div>' +
+      '</div><div class="map-pop" hidden><button class="tip-close" aria-label="Закрыть">×</button><div class="lg-title">Что показывать</div><div class="pop-grid">' + chips + '</div><button class="btn pop-save" data-save>⬇️ Сохранить подробную карту офлайн (7 МБ)</button></div>' +
+      '<div class="map-mode" hidden></div><div class="map-tip" hidden></div><div class="map-legend" hidden></div><div class="map-sheet" hidden></div></div>' +
+      '<div class="seg" role="tablist">' + tabs.map((t) => '<button role="tab" data-tab="' + t[0] + '"' + (t[0] === startTab ? ' class="on" aria-selected="true"' : '') + '><span>' + t[1] + '</span>' + t[2] + '</button>').join('') + '</div>' +
+      '<div class="pane" data-pane="way"><div id="navInfo"></div></div>' +
+      '<div class="pane" data-pane="loot"><div class="loot-pick"><select id="lootSel" aria-label="Предмет"><option value="">— какой предмет ищешь? —</option>' + opts + '</select></div><div id="lootInfo">' + lootResult(lootRef) + '</div></div>' +
+      '<div class="pane" data-pane="mine"><div id="mineInfo"></div></div>' +
+      '<div class="pane" data-pane="ready"><p class="lb-note">Проверенные пути для кепки и частые ошибки. Нажми, чтобы раскрыть.</p><div class="pl-tier">✅ Хорошие маршруты</div>' + M.routes.filter((r) => r.verdict === 'good').map(ready).join('') +
+        '<div class="pl-tier">❌ Так лучше не ходить</div>' + M.routes.filter((r) => r.verdict !== 'good').map(ready).join('') + '</div>' +
       '<p class="map-credit">Карта: © Bohemia Interactive, <a href="https://github.com/BohemiaInteractive/DayZ-Central-Economy" target="_blank" rel="noopener">DayZ Central Economy</a>, лицензия <a href="https://www.bohemia.net/community/licenses/arma-and-dayz-public-license-share-alike-adpl-sa" target="_blank" rel="noopener">ADPL-SA</a>. Доработка: STROM.</p>' +
-      '<datalist id="townList">' + towns.map((t) => '<option value="' + esc(t.name) + '">' + esc(t.en || '') + '</option>').join('') + '</datalist>' +
-      '<h2 class="g-head"><span class="g-ico">📍</span>Где я и куда иду</h2>' +
-      '<div class="nav-box"><label>Я у города (с таблички)<input id="meIn" list="townList" autocomplete="off" placeholder="Например: Горка"></label>' +
-        '<label>Иду в<input id="destIn" list="townList" autocomplete="off" placeholder="Например: Новый Собор"></label></div>' +
-      '<p class="nav-tip">Или нажми 📍 на карте и поставь точку сам.</p><div id="navInfo"></div>' +
-      '<h2 class="g-head"><span class="g-ico">✏️</span>Свой маршрут</h2><div id="mineInfo"></div>' +
-      '<h2 class="g-head"><span class="g-ico">🔎</span>Где найти предмет</h2>' +
-      '<div class="loot-pick"><select id="lootSel" aria-label="Предмет"><option value="">— выбери предмет —</option>' + opts + '</select></div><div id="lootInfo">' + lootResult(lootRef) + '</div>' +
-      '<h2 class="g-head"><span class="g-ico">✅</span>Хорошие маршруты для кепки</h2>' + M.routes.filter((r) => r.verdict === 'good').map(card).join('') +
-      '<h2 class="g-head"><span class="g-ico">❌</span>Частые ошибки новичков</h2>' + M.routes.filter((r) => r.verdict !== 'good').map(card).join('') +
-      '<p class="map-note">' + esc(M.note) + ' ' + esc(M.loot_note || '') + ' Проверено: ' + esc(M.checked) + '.</p>' + footer() + '</div>';
+      '<details class="map-about"><summary>О карте и данных</summary><p class="map-note">' + esc(M.note) + ' ' + esc(M.loot_note || '') + ' Варианты пути считает программа по этой же картинке: она не знает про заборы, скалы и других игроков. Время — прикидка для бега трусцой, около 4 м/с. Проверено: ' + esc(M.checked) + '.</p></details>' + footer() + '</div>';
 
-    const page = $view.querySelector('.map-page'), wrap = page.querySelector('.map-wrap');
+    const page = $view.querySelector('.map-page'), wrap = page.querySelector('.map-wrap'), box = page.querySelector('.pl-box');
     const toMap = () => { document.body.classList.remove('bar-hide'); window.scrollTo({ top: Math.max(0, wrap.getBoundingClientRect().top + window.scrollY - (document.getElementById('topbar').offsetHeight || 0) - 8), behavior: 'smooth' }); };
+    const showTab = (id) => { page.querySelectorAll('[data-tab]').forEach((b) => { const on = b.dataset.tab === id; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); }); page.querySelectorAll('[data-pane]').forEach((d) => { d.hidden = d.dataset.pane !== id; }); };
+    showTab(startTab);
+    page.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => showTab(b.dataset.tab)));
     const modeBar = page.querySelector('.map-mode'), navInfo = document.getElementById('navInfo'), mineInfo = document.getElementById('mineInfo');
-    const meIn = document.getElementById('meIn'), destIn = document.getElementById('destIn');
-    const line = (ico, label, q) => (q ? '<button class="pl-btn" data-go="' + q.x + ',' + q.z + '"><span>' + ico + ' ' + label + (q.name ? ': ' + esc(q.name) : '') + '</span><span class="nav-d">' + km(Math.max(0, q.d)) + ' · ' + q.b.dir + '</span></button>' : '');
+    const inF = document.getElementById('plFrom'), inT = document.getElementById('plTo'), sug = page.querySelector('.pl-sug');
     const bindGo = (root) => root.querySelectorAll('[data-go]').forEach((b) => b.addEventListener('click', () => { const [x, z] = b.dataset.go.split(',').map(Number); toMap(); DM.flyTo(x, z); }));
-    const dangerHTML = (list) => list.map((d) => '<div class="nav-warn">' + (d.kind === 'gas' ? '☣️ Идёшь через газ: ' : '⚠️ Рядом военка: ') + esc(d.name) + '. Обойди круг стороной.</div>').join('');
+    const tick = () => new Promise((r) => setTimeout(r, 30));
+
+    // ----- поиск мест -----
+    const places = () => {
+      if (state.places && state.places.full) return state.places;
+      const L = M.towns.map((t) => ({ i: t.big ? '🏙️' : '🏘️', name: t.name, en: t.en, sub: t.big ? 'город' : 'деревня', x: t.x, z: t.z, w: t.big ? 0 : 1 }))
+        .concat(M.military.map((m) => ({ i: '🎖️', name: m.name, sub: 'военный объект', x: m.x, z: m.z, w: 3 })));
+      const P = state.mapPoi;
+      if (P) {
+        P.poi.filter((p) => ['camp', 'castle', 'prison', 'mil'].includes(p.k)).forEach((p) => L.push({ i: p.k === 'camp' ? '🏕️' : p.k === 'castle' ? '🏰' : p.k === 'mil' ? '🎖️' : '⛓️', name: p.t, sub: 'рядом: ' + p.s, x: p.x, z: p.z, w: p.k === 'mil' ? 4 : 2 }));
+        P.names.filter((n) => n[0] !== 'sea').forEach((n) => L.push({ i: n[0] === 'hill' ? '⛰️' : n[0] === 'lake' ? '💧' : '📌', name: n[1], sub: n[0] === 'hill' ? 'гора' : n[0] === 'lake' ? 'водоём' : 'местность', x: n[2], z: n[3], w: 2.5 }));
+        L.full = true;
+      }
+      L.forEach((q) => { q._n = norm(q.name); q._e = norm(q.en || ''); });
+      state.places = L; return L;
+    };
+    const find = (v) => { const q = norm(v).trim(); if (!q) return []; return places().map((p) => ({ p, s: p._n.startsWith(q) || p._e.startsWith(q) ? 0 : p._n.includes(' ' + q) || p._n.includes('«' + q) ? 1 : p._n.includes(q) || p._e.includes(q) ? 2 : q.split(' ').every((w) => (' ' + p._n).includes(' ' + w)) ? 2 : 9 })).filter((o) => o.s < 9).sort((a, b) => a.s - b.s || a.p.w - b.p.w || a.p.name.length - b.p.name.length).slice(0, 7).map((o) => o.p); };
+    let curIn = null, curList = [];
+    const closeSug = () => { sug.hidden = true; curIn = null; };
+    const choose = (inp, p) => { closeSug(); inp.blur(); showTab('way'); const q = { x: p.x, z: p.z, name: p.name }; if (inp === inF) { DM.setMe(q); trackEvent('map-me', { town: p.name }); } else DM.setDest(q); if (!(DM.getState().me && DM.getState().dest)) DM.flyTo(p.x, p.z, 4200); };
+    const openSug = (inp) => {
+      curIn = inp; curList = find(inp.value);
+      sug.innerHTML = '<button class="sg" data-s="map"><span class="sg-i">' + (inp === inF ? '📍' : '🎯') + '</span><span><b>Указать на карте</b><small>нажми на карту в нужном месте</small></span></button>' +
+        curList.map((p, i) => '<button class="sg" data-s="' + i + '"><span class="sg-i">' + p.i + '</span><span><b>' + esc(p.name) + '</b><small>' + esc(p.sub) + (p.en ? ' · ' + esc(p.en) : '') + '</small></span></button>').join('') +
+        (inp.value.trim() && !curList.length ? '<p class="sg-no">Не нашёл такое место. Попробуй первые буквы.</p>' : '');
+      sug.hidden = false;
+      sug.querySelectorAll('[data-s]').forEach((b) => b.addEventListener('pointerdown', (e) => { e.preventDefault(); if (b.dataset.s === 'map') { closeSug(); inp.blur(); toMap(); DM.setMode(inp === inF ? 'me' : 'dest'); } else choose(inp, curList[+b.dataset.s]); }));
+    };
+    [inF, inT].forEach((inp) => {
+      inp.addEventListener('focus', () => { inp.select(); openSug(inp); });
+      inp.addEventListener('input', () => openSug(inp));
+      inp.addEventListener('blur', () => setTimeout(() => { if (curIn === inp) closeSug(); syncInputs(); }, 180));
+      inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { const r = find(inp.value); if (r.length) choose(inp, r[0]); else toast('Не нашёл такое место'); } else if (e.key === 'Escape') { closeSug(); inp.blur(); } });
+    });
+    const syncInputs = () => {
+      const s = DM.getState();
+      if (document.activeElement !== inF) inF.value = s.me ? s.me.name : '';
+      if (document.activeElement !== inT) inT.value = s.dest ? s.dest.name : '';
+      box.querySelector('[data-x="from"]').hidden = !s.me; box.querySelector('[data-x="to"]').hidden = !s.dest;
+    };
+    box.querySelector('[data-x="from"]').addEventListener('click', () => { inF.value = ''; DM.setMe(null); });
+    box.querySelector('[data-x="to"]').addEventListener('click', () => { inT.value = ''; DM.setDest(null); });
+    box.querySelectorAll('[data-pick]').forEach((b) => b.addEventListener('click', () => { toMap(); showTab('way'); DM.setMode(DM.getState().mode === b.dataset.pick ? null : b.dataset.pick); }));
+    box.querySelector('.pl-swap').addEventListener('click', () => { const s = DM.getState(); const a = s.me, b = s.dest; DM.setMe(b); DM.setDest(a); });
+
+    // ----- варианты пути -----
+    let plans = [], cur = null, key = '', job = 0;
+    const env = () => ({ towns: M.towns, water: M.points.water, medical: M.points.hospital.concat(M.points.clinic), police: M.points.police, spawn: M.points.spawn, shops: state.mapPoi ? state.mapPoi.poi.filter((p) => p.k === 'shop').map((p) => [p.x, p.z]) : [], dangers: DM.dangers(), tierAt: DM.tierAt });
+    const tm = (m) => (m < 60 ? m + ' мин' : Math.floor(m / 60) + ' ч ' + (m % 60) + ' мин');
+    const drawPlans = () => {
+      const s = DM.getState(), r = plans.find((q) => q.id === cur) || plans[0]; if (!r) return;
+      const b = DM.bearing(s.me, { x: r.path[Math.min(2, r.path.length - 1)][0], z: r.path[Math.min(2, r.path.length - 1)][1] });
+      navInfo.innerHTML = '<div class="pv">' + plans.map((q) => '<button class="pv-c k-' + q.id + (q === r ? ' on' : '') + '" data-p="' + q.id + '"><span class="pv-t">' + q.icon + ' ' + esc(q.title) + '</span><b>≈ ' + tm(q.min) + '</b><small>' + q.km.toFixed(1).replace('.', ',') + ' км</small>' + (q.dangers.length ? '<em>⚠️ опасно: ' + q.dangers.length + '</em>' : '<em class="ok">без военки</em>') + '</button>').join('') + '</div>' +
+        '<div class="nav-card"><div class="nav-note">' + esc(r.note) + '</div>' +
+        (r.swim ? '<div class="nav-warn">🌊 По суше не пройти: часть пути придётся плыть.</div>' : '') +
+        r.dangers.map((d) => '<div class="nav-warn">' + (d.kind === 'gas' ? '☣️ Газ: ' : '⚠️ Военка на пути: ') + esc(d.name) + '</div>').join('') +
+        (r.spawns ? '<div class="nav-warn">🧢 Рядом спавн: там много кепок.</div>' : '') +
+        '<div class="ms-stats"><span>💧 колонок: <b>' + r.water + '</b></span><span>✚ медицина: <b>' + r.medical + '</b></span><span>🚓 полиция: <b>' + r.police + '</b></span><span>🛒 магазинов: <b>' + r.shops + '</b></span></div>' +
+        (r.t1 ? '<div class="tier-path"><span class="tip-tier t' + r.t0 + '">Старт: Tier ' + r.t0 + '</span> → <span class="tip-tier t' + r.t1 + '">Финиш: Tier ' + r.t1 + '</span></div>' : '') +
+        '<ol class="way"><li><span class="w-d from"></span><b>' + esc(s.me.name) + '</b><small>выходи на ' + b.dir + ' (' + b.deg + '°)</small></li>' +
+        r.via.map((v) => '<li data-go="' + v.x + ',' + v.z + '"><span class="w-d"></span>' + esc(v.name) + '<small>' + km(v.at) + ' от старта' + (r.stops.some((q) => q.name === v.name) ? ' · 🎒 лут' : '') + '</small></li>').join('') +
+        '<li><span class="w-d to"></span><b>' + esc(s.dest.name) + '</b><small>' + r.km.toFixed(1).replace('.', ',') + ' км</small></li></ol>' +
+        '<div class="mine-act"><button class="btn" data-a="show">🗺️ Показать</button><button class="btn" data-a="share">📤 Другу</button></div></div>';
+      navInfo.querySelectorAll('[data-p]').forEach((c) => c.addEventListener('click', () => { cur = c.dataset.p; DM.setPlans(plans, cur); drawPlans(); }));
+      bindGo(navInfo);
+      navInfo.querySelector('[data-a="show"]').addEventListener('click', () => { toMap(); DM.setPlans(plans, cur, true); });
+      navInfo.querySelector('[data-a="share"]').addEventListener('click', () => { const f = (q) => Math.round(q.x / 10) + '.' + Math.round(q.z / 10); shareSheet({ id: 'plan', title: 'Маршрут в DayZ', text: 'Маршрут в DayZ: ' + s.me.name + ' → ' + s.dest.name + ', ' + r.km.toFixed(1).replace('.', ',') + ' км', url: location.href.split('#')[0] + '#map?from=' + f(s.me) + '&to=' + f(s.dest) }); });
+    };
+    const build = async () => {
+      const s = DM.getState(), my = ++job;
+      if (!NAV || !NAV.ready() || !state.mapPoi) { navInfo.innerHTML = '<p class="lb-note">⏳ Загружаю карту дорог…</p>'; key = ''; return; }
+      if (DM.dist(s.me, s.dest) < 120) { plans = []; DM.setPlans([]); navInfo.innerHTML = '<p class="lb-note">Ты уже почти на месте.</p>'; return; }
+      navInfo.innerHTML = '<p class="lb-note">⏳ Ищу путь…</p>';
+      await tick(); if (my !== job) return;
+      plans = NAV.plan(s.me, s.dest, env());
+      if (!plans.length) { DM.setPlans([]); navInfo.innerHTML = '<p class="lb-note">Не нашёл пути между этими точками.</p>'; return; }
+      cur = plans[0].id; DM.setPlans(plans, cur, true); drawPlans();
+      trackEvent('map-plan', { from: s.me.name, to: s.dest.name });
+    };
+    // ----- куда пойти, если цели нет -----
+    const suggest = (p) => {
+      const A = DM.around(p), D = (q) => DM.dist(p, q), P = state.mapPoi ? state.mapPoi.poi : [], dz = DM.dangers();
+      const calm = (q, m) => !dz.some((d) => DM.dist(d, q) < d.r + (d.kind === 'gas' ? 700 : m || 80)), T = DM.tierAt(p.x, p.z);
+      const best = (list, m) => list.filter((q) => D(q) > (m || 60)).sort((a, b) => D(a) - D(b))[0];
+      const pts = (list) => list.map((q) => ({ x: q[0], z: q[1], name: q[2] }));
+      const deep = best(M.towns.filter((t) => t.tier > T && calm(t, 150) && !M.points.spawn.some((q) => DM.dist({ x: q[0], z: q[1] }, t) < 1500)), 900);
+      const row = (i, t, d, q, warn) => (q ? '<button class="sg go' + (warn ? ' warn' : '') + '" data-to="' + q.x + ',' + q.z + '" data-n="' + esc(q.n || q.name || t) + '"><span class="sg-i">' + i + '</span><span><b>' + t + '</b><small>' + esc(d) + '</small></span><span class="nav-d">' + km(D(q)) + '<br>' + DM.bearing(p, q).dir + '</span></button>' : '');
+      const med = best(pts(M.points.hospital.concat(M.points.clinic)).filter(calm)) || best(pts(M.points.hospital.concat(M.points.clinic)));
+      const camp = best(P.filter((q) => (q.k === 'camp' || q.k === 'cabin') && calm(q)).map((q) => ({ x: q.x, z: q.z, name: q.t, n: q.t })), 250);
+      const mil = best(dz.filter((d) => d.kind === 'mil'));
+      const good = M.routes.filter((r) => r.verdict === 'good' && r.path && Math.hypot(r.path[0][0] - p.x, r.path[0][1] - p.z) < 1800);
+      const inD = A.danger && A.danger.d <= 0;
+      return '<div class="nav-top"><b>Ты здесь: ' + esc(p.name) + '</b>' + (T ? '<span class="tip-tier t' + T + '">Tier ' + T + '</span>' : '') + '</div>' +
+        (inD ? '<div class="nav-warn">' + (A.danger.kind === 'gas' ? '☣️ Ты в газовой зоне: ' : '⚠️ Ты в опасной зоне: ') + esc(A.danger.name) + '. Уходи.</div>' : '') +
+        '<div class="pl-tier">Куда пойти отсюда</div>' +
+        row('💧', 'Попить', 'колонка: ' + (A.water ? A.water.name : ''), A.water) + row('✚', 'За медициной', med ? 'рядом: ' + med.name : '', med) + row('🚓', 'За оружием', A.police ? 'полиция: ' + A.police.name : '', A.police) +
+        row('🏕️', 'Тихое место', camp ? camp.name : '', camp) + row('🧭', 'Вглубь, где лут лучше', deep ? deep.name + ', Tier ' + deep.tier : '', deep) + row('🎖️', 'Военка — опасно', mil ? mil.name : '', mil, true) +
+        (good.length ? '<div class="pl-tier">Готовые маршруты рядом</div>' + good.map((r) => '<button class="sg go" data-r="' + r.id + '"><span class="sg-i">✅</span><span><b>' + esc(r.title) + '</b><small>' + esc(r.summary) + '</small></span><span class="nav-d">' + String(r.stats.km).replace('.', ',') + ' км</span></button>').join('') : '');
+    };
+    const drawMine = (s) => {
+      if (!s.mine.length) {
+        mineInfo.innerHTML = '<p class="lb-note">Нарисуй путь прямо на карте: он сохранится на телефоне, и его можно отправить другу.</p><button class="btn mine-start">✏️ Нарисовать маршрут</button>';
+        mineInfo.querySelector('button').addEventListener('click', () => { toMap(); DM.setMode('draw'); }); return;
+      }
+      mineInfo.innerHTML = '<div class="nav-card"><div class="nav-dest">Точек: <b>' + s.mine.length + '</b>' + (s.mine.length > 1 ? ' · длина <b>' + km(DM.lineKm(s.mine) * 1000) + '</b>' : '') + '</div>' +
+        DM.dangersOn(s.mine).map((d) => '<div class="nav-warn">' + (d.kind === 'gas' ? '☣️ Идёшь через газ: ' : '⚠️ Рядом военка: ') + esc(d.name) + '</div>').join('') +
+        '<div class="mine-act"><button class="btn" data-a="show">🗺️ Показать</button><button class="btn" data-a="draw">✏️ Дорисовать</button><button class="btn" data-a="share"' + (s.mine.length > 1 ? '' : ' disabled') + '>📤 Другу</button><button class="btn" data-a="clear">🗑️ Стереть</button></div></div>';
+      mineInfo.querySelectorAll('[data-a]').forEach((b) => b.addEventListener('click', () => {
+        const a = b.dataset.a;
+        if (a === 'clear') { if (confirm('Стереть свой маршрут?')) DM.clearMine(); }
+        else if (a === 'draw') { toMap(); DM.setMode('draw'); }
+        else if (a === 'show') { toMap(); DM.fitMine(); }
+        else { const m = DM.getState().mine; shareSheet({ id: 'my-route', title: 'Маршрут в DayZ', text: 'Мой маршрут в DayZ, ' + km(DM.lineKm(m) * 1000), url: location.href.split('#')[0] + '#map?my=' + m.slice(0, 60).map((q) => Math.round(q[0] / 10) + '.' + Math.round(q[1] / 10)).join('_') }); }
+      }));
+    };
     const onState = (s) => {
-      page.querySelectorAll('[data-mode]').forEach((b) => b.classList.toggle('on', s.mode === b.dataset.mode));
+      page.querySelectorAll('[data-pick]').forEach((b) => b.classList.toggle('on', s.mode === b.dataset.pick));
       modeBar.hidden = !s.mode;
-      modeBar.innerHTML = s.mode === 'me' ? '<span>Нажми на карту там, где ты сейчас</span><button data-m="off">Отмена</button>'
+      modeBar.innerHTML = s.mode === 'me' ? '<span>📍 Нажми на карту там, где ты сейчас</span><button data-m="off">Отмена</button>' : s.mode === 'dest' ? '<span>🎯 Нажми на карту, куда идёшь</span><button data-m="off">Отмена</button>'
         : s.mode === 'draw' ? '<span>Нажимай точки маршрута · ' + (s.mine.length > 1 ? km(DM.lineKm(s.mine) * 1000) : s.mine.length + ' точ.') + '</span><button data-m="undo">↩︎</button><button data-m="off">Готово</button>' : '';
       modeBar.querySelectorAll('[data-m]').forEach((b) => b.addEventListener('click', () => (b.dataset.m === 'undo' ? DM.undo() : DM.setMode(null))));
+      syncInputs(); drawMine(s);
+      const k = [s.me && s.me.x, s.me && s.me.z, s.dest && s.dest.x, s.dest && s.dest.z, !!state.mapPoi, !!(NAV && NAV.ready())].join();
+      if (k === key) return;
+      key = k;
+      if (s.me && s.dest) { build(); return; }
+      job++;
+      if (plans.length) { plans = []; DM.setPlans([]); }
       if (s.me) {
-        const a = DM.around(s.me), inD = a.danger && a.danger.d <= 0;
-        let h = '<div class="nav-card"><div class="nav-top"><b>📍 ' + esc(s.me.name) + '</b><button class="lb-x" data-x="me" aria-label="Убрать метку">✕</button></div>' +
-          (a.tier ? '<div class="tip-tier t' + a.tier + '">Зона лута: Tier ' + a.tier + '</div>' : '') +
-          (inD ? '<div class="nav-warn">' + (a.danger.kind === 'gas' ? '☣️ Ты в газовой зоне: ' : '⚠️ Ты в опасной зоне: ') + esc(a.danger.name) + '. Уходи.</div>' : '');
-        if (s.dest) {
-          const b = DM.bearing(s.me, s.dest);
-          h += '<div class="nav-dest">🏁 ' + esc(s.dest.name) + ': <b>' + km(DM.dist(s.me, s.dest)) + '</b> по прямой, держи на <b>' + b.dir + ' (' + b.deg + '°)</b></div>' +
-            dangerHTML(DM.dangersOn([[s.me.x, s.me.z], [s.dest.x, s.dest.z]])) + '<button class="btn nav-clear" data-x="dest">Убрать цель</button>';
-        }
-        h += '<div class="pl-tier">Ближайшее от тебя</div>' + (a.town && a.town.d > 150 ? line('🏘️', 'Посёлок', a.town) : '') + line('💧', 'Колонка', a.water) + line('✚', 'Медицина', a.medical) + line('🚓', 'Полиция', a.police) +
-          (a.danger && !inD ? line(a.danger.kind === 'gas' ? '☣️' : '⚠️', 'Опасно', a.danger) : '') + '</div>';
-        navInfo.innerHTML = h; bindGo(navInfo);
-        navInfo.querySelectorAll('[data-x]').forEach((b) => b.addEventListener('click', () => { if (b.dataset.x === 'me') { meIn.value = ''; destIn.value = ''; DM.setDest(null); DM.setMe(null); } else { destIn.value = ''; DM.setDest(null); } }));
-      } else navInfo.innerHTML = s.dest ? '<p class="lb-note">Теперь укажи, где ты — покажу направление и опасные места по пути.</p>' : '';
-      if (s.mine.length) {
-        mineInfo.innerHTML = '<div class="nav-card"><div class="nav-dest">Точек: <b>' + s.mine.length + '</b>' + (s.mine.length > 1 ? ' · длина <b>' + km(DM.lineKm(s.mine) * 1000) + '</b>' : '') + '</div>' + dangerHTML(DM.dangersOn(s.mine)) +
-          '<div class="mine-act"><button class="btn" data-a="show">🗺️ Показать</button><button class="btn" data-a="draw">✏️ Дорисовать</button><button class="btn" data-a="share"' + (s.mine.length > 1 ? '' : ' disabled') + '>📤 Другу</button><button class="btn" data-a="clear">🗑️ Стереть</button></div></div>';
-        mineInfo.querySelectorAll('[data-a]').forEach((b) => b.addEventListener('click', () => {
-          const a = b.dataset.a;
-          if (a === 'clear') { if (confirm('Стереть свой маршрут?')) DM.clearMine(); }
-          else if (a === 'draw') { toMap(); DM.setMode('draw'); }
-          else if (a === 'show') { toMap(); DM.fitMine(); }
-          else { const m = DM.getState().mine; shareSheet({ id: 'my-route', title: 'Маршрут в DayZ', text: 'Мой маршрут в DayZ, ' + km(DM.lineKm(m) * 1000), url: location.href.split('#')[0] + '#map?my=' + m.slice(0, 60).map((q) => Math.round(q[0] / 10) + '.' + Math.round(q[1] / 10)).join('_') }); }
-        }));
-      } else {
-        mineInfo.innerHTML = '<p class="lb-note">Нарисуй путь прямо на карте: он сохранится на телефоне, и его можно отправить другу.</p><button class="btn mine-start">✏️ Нарисовать маршрут</button>';
-        mineInfo.querySelector('button').addEventListener('click', () => { toMap(); DM.setMode('draw'); });
-      }
+        navInfo.innerHTML = suggest(s.me);
+        navInfo.querySelectorAll('[data-to]').forEach((b) => b.addEventListener('click', () => { const [x, z] = b.dataset.to.split(',').map(Number); toMap(); DM.setDest({ x, z, name: b.dataset.n }); }));
+        navInfo.querySelectorAll('[data-r]').forEach((b) => b.addEventListener('click', () => DM.select(b.dataset.r)));
+      } else navInfo.innerHTML = s.dest ? '<p class="lb-note">Теперь укажи, где ты, и я предложу варианты пути.</p>' : '<div class="nav-hint"><b>🧭 Навигатор</b><p>Напиши сверху город с таблички, и карта подскажет, куда идти. Укажешь цель — предложит безопасный, быстрый путь и путь с лутом.</p></div>';
     };
     const nav = (id) => { const h = '#map' + (id ? '/' + id : ''); if (h !== (location.hash || '#') && !(!id && /\?/.test(location.hash))) { replaceHash(h); if (id) trackView('/map/' + id); } };
     DM.mount(page, M, focusId, nav, lootFilter(lootRef), onState);
+    DM.onPlan = (id) => { cur = id; showTab('way'); drawPlans(); };
     onState(DM.getState());
-    page.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => DM.setMode(DM.getState().mode === b.dataset.mode ? null : b.dataset.mode)));
-    const pick = (inp, fn) => inp.addEventListener('change', () => { if (!inp.value.trim()) return fn(null); const t = findTown(inp.value); if (!t) return toast('Не нашёл такой город'); inp.value = t.name; inp.blur(); fn(t); });
-    pick(meIn, (t) => { DM.setMe(t && { x: t.x, z: t.z, name: t.name }); if (t) { toMap(); const s = DM.getState(); if (s.dest) DM.setDest(s.dest); else DM.flyTo(t.x, t.z, 3600); trackEvent('map-me', { town: t.name }); } });
-    pick(destIn, (t) => { DM.setDest(t && { x: t.x, z: t.z, name: t.name }); if (t) { toMap(); if (!DM.getState().me) DM.flyTo(t.x, t.z, 3600); } });
     // панель слоёв и сохранение карты
     const pop = page.querySelector('.map-pop');
     page.querySelector('[data-zoom="layers"]').addEventListener('click', () => { pop.hidden = !pop.hidden; page.querySelector('.map-legend').hidden = true; });
@@ -806,13 +902,19 @@
       if (sel.value) { toMap(); trackEvent('map-loot', { item: sel.value }); }
     });
     page.querySelectorAll('[data-route]').forEach((b) => b.addEventListener('click', () => DM.select(b.dataset.route)));
+    if (pFrom && pTo) setTimeout(() => {
+      const nm = (q) => { const t = M.towns.find((w) => Math.hypot(w.x - q[0], w.z - q[1]) < 25); return { x: q[0], z: q[1], name: t ? t.name : 'Точка на карте' }; };
+      DM.setMe(nm(pFrom)); DM.setDest(nm(pTo)); replaceHash('#map');
+    }, 60);
     if (shared) {
       const pts = shared.split('_').map((q) => q.split('.').map((n) => +n * 10)).filter((q) => q.length === 2 && q.every((n) => n >= 0 && n <= M.size)).slice(0, 60);
       const had = DM.getState().mine.length;
-      if (pts.length > 1) setTimeout(() => { if (!had || confirm('Открыть маршрут из ссылки? Твой нарисованный маршрут заменится.')) DM.setMine(pts); replaceHash('#map'); }, 60);
+      if (pts.length > 1) setTimeout(() => { if (!had || confirm('Открыть маршрут из ссылки? Твой нарисованный маршрут заменится.')) { DM.setMine(pts); showTab('mine'); } replaceHash('#map'); }, 60);
     }
+    const again = () => { if (wrap.isConnected) onState(DM.getState()); };
     if (state.mapPoi) DM.setPoi(state.mapPoi);
-    else getJSON('data/map-poi.json').then((v) => { state.mapPoi = v; DM.setPoi(v); }).catch((e) => console.warn('map-poi', e));
+    else getJSON('data/map-poi.json').then((v) => { state.mapPoi = v; DM.setPoi(v); again(); }).catch((e) => console.warn('map-poi', e));
+    if (NAV && !NAV.ready()) getJSON('data/map-grid.json').then((v) => { NAV.load(v); again(); }).catch((e) => console.warn('map-grid', e));
     if (state.mapVec) DM.setVectors(state.mapVec);
     else getJSON('data/map-vec.json').then((v) => { state.mapVec = v; DM.setVectors(v); }).catch((e) => console.warn('map-vec', e));
   }

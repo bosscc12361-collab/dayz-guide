@@ -9,6 +9,7 @@
 | `img/map/chernarus.jpg` | `CETool/ChernarusPlus/map.png`, `layers/water-sea.tga` | осветлено, изменены цвета, закрашено море |
 | `img/map/t/*.webp` | те же файлы | увеличено, края дорог и деревья дорисованы программой (отдельные деревья не настоящие) |
 | `data/map-poi.json` | `mapgrouppos.xml`, `mapgroupproto.xml`, `cfgeventspawns.xml` | выбраны и сгруппированы метки, добавлены русские подписи |
+| `data/map-grid.json` | `CETool/ChernarusPlus/map.png`, `layers/water-sea.tga` | сетка «поле, дорога, лес, море» для поиска пути |
 | `data/map-vec.json` | `mapgroupcluster*.xml`, `mapgrouppos.xml`, `mapgroupproto.xml`, `layers/water-fresh.tga` | выбраны рельсы, тропы, дома, реки, упрощено |
 | `data/map.json` | `mapgrouppos.xml`, `cfgplayerspawnpoints.xml`, `cfgEffectArea.json`, `areaflags.map`, `types.xml` | выбраны точки, посчитаны зоны и маршруты, добавлены тексты |
 | `data/loot.json`, поля `where`, `spawn`, `ammo_where` в `data/weapons.json` | `db/types.xml` | переведено на русский, сгруппировано |
