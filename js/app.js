@@ -478,14 +478,30 @@
     }
   }
 
+  // «м4» = «m4», «akm» = «акм»: если прямого совпадения нет, пробуем другую раскладку букв
+  const LOOK = { 'а': 'a', 'в': 'b', 'е': 'e', 'к': 'k', 'м': 'm', 'н': 'h', 'о': 'o', 'р': 'p', 'с': 'c', 'т': 't', 'у': 'y', 'з': '3', 'б': '6' };
+  const SOUND = { 'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch', 'ы': 'y', 'ь': '', 'ъ': '', 'э': 'e', 'ю': 'yu', 'я': 'ya' };
+  const BACK = Object.fromEntries(Object.entries(SOUND).filter((x) => x[1].length === 1 && !'йыэ'.includes(x[0])).map((x) => [x[1], x[0]]));
+  const swap = (t, map) => t.split('').map((c) => (c in map ? map[c] : c)).join('');
+  const flat = (t) => t.replace(/(\S)-(?=\S)/g, '$1');
+
   function search(q) {
-    const tokens = norm(q).split(' ').filter(Boolean);
+    const direct = norm(q).split(' ').filter(Boolean);
+    if (!direct.length) return [];
+    const tries = [direct, [direct.join('')]];
+    [LOOK, SOUND, BACK].forEach((m) => tries.push(direct.map((t) => swap(t, m)), [swap(direct.join(''), m)]));
+    for (const tokens of tries) { const r = searchTokens(tokens.filter(Boolean)); if (r.length) return r; }
+    return [];
+  }
+
+  function searchTokens(tokens) {
     if (!tokens.length) return [];
     const out = [];
     for (const s of state.sections.concat(state.mapSec ? [state.mapSec] : [])) {
       for (const it of s.items) {
-        if (!tokens.every((t) => it._search.includes(t))) continue;
-        const t = norm(it.title) + ' ' + norm(it.title_en);
+        if (!it._flat) { const al = norm((it.aliases || []).join(' ')); it._flat = flat(it._search + ' ' + al); it._head = norm(it.title) + ' ' + norm(it.title_en) + ' ' + al; }
+        if (!tokens.every((t) => it._search.includes(t) || it._flat.includes(flat(t)))) continue;
+        const t = it._head + ' ' + flat(it._head);
         let score = 0;
         for (const tok of tokens) {
           if (t.startsWith(tok)) score += 6;
