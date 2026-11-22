@@ -109,7 +109,7 @@
     const gSpawn = g('spawn');
     D.points.spawn.forEach((p, i) => mk(gSpawn, p[0], p[1], 'spawn-' + i, 'spawn', '<circle r="12" class="spawn"/><text class="cap cap-2" y="25">Спавн</text>'));
     const gGas = g('gas');
-    D.zones.forEach((z) => mk(gGas, z.x, z.z, z.id, 'gas', '<circle r="12" class="gas-ico"/><text class="ico" y="5">☣</text><text class="cap cap-0 bad" y="27">Газ!</text>'));
+    D.zones.forEach((z) => mk(gGas, z.x, z.z, z.id, 'gas', '<circle r="12" class="gas-ico"/><g class="pi pi-dark" transform="translate(-8 -8) scale(.667)">' + window.DZIcons.raw('gas') + '</g><text class="cap cap-0 bad" y="27">Газ!</text>'));
     const gHunt = g('hunting');
     D.points.hunting.forEach((p, i) => mk(gHunt, p[0], p[1], 'hunting-' + i, 'hunting', '<circle r="9" class="hit"/><path d="M0 -5.5 L5 4 L-5 4 Z" class="hunt"/>'));
     const gWater = g('water');
@@ -151,7 +151,7 @@
         : p.k === 'guard' ? '<circle r="10" class="hit"/><circle r="6" class="police"/><text class="pl" y="3.2" style="font-size:8px">P</text>'
         : p.k === 'feed' ? '<circle r="9" class="hit"/><path d="M0 -4 L3.8 3 L-3.8 3 Z" class="hunt"/>'
         : p.k === 'milbox' ? '<circle r="10" class="hit"/><rect x="-5" y="-4" width="10" height="8" rx="1.5" class="mil"/>'
-        : '<circle r="9" class="poi-bg"/><text class="ico poi-i" y="3.7">' + c.i + '</text>';
+        : '<circle r="9" class="poi-bg"/><g class="pi" transform="translate(-5.6 -5.6) scale(.467)">' + window.DZIcons.byEmoji(c.i) + '</g>';
       const m = mk(g(c.l), p.x, p.z, 'p-' + i, 'poi pv' + c.lv + (p.k === 'mil' ? ' mil2' : ''), body + '<text class="cap cap-p" y="' + (small ? 17 : 19) + '">' + esc(p.t || '') + '</text>');
       m._k = p.k;
     });
@@ -562,7 +562,7 @@
       arrowsAlong(mine).forEach((q) => mk(g, q[0], q[1], '', 'arrow own', '<path d="M-6 -6 L6 0 L-6 6 Z" class="arrow-p"/>', ';--r:' + q[2] + 'deg'));
     }
     mine.forEach((q, i) => mk(g, q[0], q[1], '', 'wp', '<circle r="7" class="wp-c own"/><text class="wp-t" y="3.3">' + (i + 1) + '</text>'));
-    if (dest) mk(g, dest.x, dest.z, '', 'flag', '<circle r="11" class="flag-c good"/><text class="ico" y="5">🏁</text>');
+    if (dest) mk(g, dest.x, dest.z, '', 'flag', '<circle r="11" class="flag-c good"/><g class="pi pi-dark" transform="translate(-6.5 -7) scale(.56)">' + window.DZIcons.raw('flag') + '</g>');
     if (me) mk(g, me.x, me.z, '', 'flag', '<circle r="16" class="me-halo"/><circle r="8" class="me-dot"/><text class="flag-t" y="-20">Я ЗДЕСЬ</text>');
     if (onState) onState({ me, dest, mine: mine.slice(), mode });
   }
@@ -728,7 +728,7 @@
     if (pts.length) pts[0] = { x: line[0][0], z: line[0][1] };
     pts.forEach((p, i) => {
       if (i === 0) mk(deco, p.x, p.z, '', 'flag', '<circle r="11" class="flag-c start"/><path d="M-3 -5 L5 0 L-3 5 Z" fill="#fff"/><text class="flag-t" y="-17">СТАРТ</text>');
-      else if (i === pts.length - 1) mk(deco, p.x, p.z, '', 'flag', '<circle r="12" class="flag-c ' + col + '"/><text class="ico" y="5">🏁</text><text class="flag-t" y="-18">ФИНИШ</text>');
+      else if (i === pts.length - 1) mk(deco, p.x, p.z, '', 'flag', '<circle r="12" class="flag-c ' + col + '"/><g class="pi pi-dark" transform="translate(-6.5 -7) scale(.56)">' + window.DZIcons.raw('flag') + '</g><text class="flag-t" y="-18">ФИНИШ</text>');
       else mk(deco, p.x, p.z, '', 'wp', '<circle r="8" class="wp-c ' + col + '"/><text class="wp-t" y="3.5">' + i + '</text>');
     });
     // весь маршрут — в видимой части (снизу свёрнутая панель)

@@ -75,7 +75,7 @@
     .replace(/[«»"'(),.;:!?]/g, ' ').replace(/\s+/g, ' ').trim();
 
   const ICONS = {
-    star: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>',
+    star: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-5-6 5z" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
     chev: '<svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     search: '<svg class="s-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
     book: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5zM4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>',
@@ -133,9 +133,9 @@
       '<input class="sh-url" readonly value="' + esc(o.url) + '">' +
       '<div class="sh-grid">' +
         '<button class="btn" data-copy>📋 Скопировать</button>' +
-        '<a class="btn" target="_blank" rel="noopener" href="https://t.me/share/url?url=' + enc(o.url) + (o.text ? '&text=' + enc(o.text) : '') + '">✈️ Telegram</a>' +
-        '<a class="btn" target="_blank" rel="noopener" href="https://wa.me/?text=' + enc(full) + '">💬 WhatsApp</a>' +
-        (navigator.share ? '<button class="btn" data-native>⋯ Другие</button>' : '<a class="btn" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=' + enc(o.url) + '">📘 Facebook</a>') +
+        '<a class="btn" target="_blank" rel="noopener" href="https://t.me/share/url?url=' + enc(o.url) + (o.text ? '&text=' + enc(o.text) : '') + '">Telegram</a>' +
+        '<a class="btn" target="_blank" rel="noopener" href="https://wa.me/?text=' + enc(full) + '">WhatsApp</a>' +
+        (navigator.share ? '<button class="btn" data-native>⋯ Другие</button>' : '<a class="btn" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=' + enc(o.url) + '">Facebook</a>') +
       '</div></div>';
     document.body.appendChild(wrap);
     const close = () => wrap.remove();
@@ -222,22 +222,21 @@
   const isFav = (secId, id) => state.favs.has(favKey(secId, id));
   function toggleFav(secId, id) {
     const k = favKey(secId, id);
-    if (state.favs.has(k)) { state.favs.delete(k); toast('Убрано из избранного'); }
-    else { state.favs.add(k); toast('Добавлено в избранное ⭐'); trackEvent('favorite-add', { card: k }); }
+    if (state.favs.has(k)) { state.favs.delete(k); toast('Убрано из «Моё»'); }
+    else { state.favs.add(k); toast('Сохранено в «Моё»'); trackEvent('favorite-add', { card: k }); }
     store.set(FAV_KEY, [...state.favs]);
     document.querySelectorAll('[data-fav="' + CSS.escape(k) + '"]').forEach((b) => {
       const on = state.favs.has(k);
       b.classList.toggle('on', on);
       b.setAttribute('aria-pressed', on);
       const lbl = b.querySelector('.lbl');
-      if (lbl) lbl.textContent = on ? 'В избранном' : 'В избранное';
+      if (lbl) lbl.textContent = on ? 'Сохранено' : 'Сохранить';
     });
   }
 
   // ---------- общие куски разметки ----------
   function badges(sec, it) {
     let b = '';
-    if (it.beginner) b += '<span class="badge ok">Новичку</span>';
     if (sec.filter && it[sec.filter]) b += '<span class="badge cal">' + esc(it[sec.filter]) + '</span>';
     if (it.safe === 'yes') b += '<span class="badge ok">Безопасно</span>';
     if (it.safe === 'caution') b += '<span class="badge warn">Осторожно</span>';
@@ -251,11 +250,12 @@
     const on = state.favs.has(k);
     const b = badges(sec, it);
     return '<div class="row">' +
-      '<a class="r-main' + (img(it) ? ' has-img' : '') + '" href="#' + esc(sec.id) + '/' + esc(it.id) + '">' +
+      '<a class="r-main' + (img(it) || sec.id === 'weapons' ? ' has-img' : '') + '" href="#' + esc(sec.id) + '/' + esc(it.id) + '">' +
+        (sec.id === 'weapons' ? '<span class="r-gun">' + window.DZIcons.gun(it.id) + '</span>' : '') +
         (img(it) ? '<img class="r-thumb" src="' + esc(img(it).src) + '" alt="" loading="lazy" decoding="async">' : '') +
         '<span class="r-body">' +
         (showSection ? '<div class="r-sec">' + esc(sec.icon) + ' ' + esc(sec.title) + '</div>' : '') +
-        '<div class="r-title">' + esc(it.title) + (it.title_en ? ' <span class="r-en">(' + esc(it.title_en) + ')</span>' : '') + '</div>' +
+        '<div class="r-title">' + esc(it.title) + (it.title_en && it.title_en !== it.title ? ' <span class="r-en">(' + esc(it.title_en) + ')</span>' : '') + '</div>' +
         (it.summary ? '<div class="r-sum">' + esc(it.summary) + '</div>' : '') +
         (b ? '<div class="r-meta">' + b + '</div>' : '') +
         '</span>' +
@@ -268,7 +268,7 @@
     const m = state.meta;
     return '<div class="footer">Данные актуальны для <b>DayZ ' + esc(m.game_version) + '</b><br>' +
       esc(m.platform) + (m.checked_date ? '<br>Проверено: ' + esc(m.checked_date) : '') +
-      (m.author ? '<br><span class="by">⚡ by ' + esc(m.author) + '</span>' : '') + '</div>';
+      (m.author ? '<br><span class="by">' + esc(m.author) + '</span>' : '') + '<br><a class="ft-a" href="#about">О гайде</a></div>';
   }
 
   function searchBox(value, autofocus) {
@@ -279,61 +279,38 @@
   }
 
   // ---------- экраны ----------
+  const ICO = (n) => window.DZIcons.svg(n);
+  const BOLT_MARK = '<svg viewBox="0 0 26 44" aria-hidden="true"><path d="M15 0 0 25h10L5 44l21-28H15l8-16Z" fill="#fff"/></svg>';
   function viewHome() {
     setChrome('DayZ Guide', 'home', false);
-    const m = state.meta;
-    const first = state.byId.first15;
-    let html = '<div class="hero">' + BOLT +
-      '<p class="brand">' + esc(m.author || 'STROM') + '</p>' +
-      '<h2>DayZ Guide</h2><p>' + esc(m.app_subtitle) + '</p></div>';
-    if (m.public_stats && m.public_stats.enabled) html += '<div class="live" id="live" hidden></div>';
-    html += '<a href="#search" class="searchbox" style="display:block;text-decoration:none">' + ICONS.search +
-      '<input type="text" readonly tabindex="-1" placeholder="Поиск по всем разделам…" style="pointer-events:none"></a>';
-    html += homeGroups();
-
+    const m = state.meta, H = m.home || {};
+    const has = { map: state.map, help: state.symptoms, patch: state.patches, quiz: state.quiz, servers: state.servers };
+    const ok = (id) => (id in has ? !!has[id] : id === 'about' || !!(state.byId[id] && state.byId[id].items.length));
+    const title = (id) => (id === 'patch' ? 'Что нового в ' + state.patches.patches[0].version : (state.byId[id] || {}).title || id);
+    const ico = (x) => (x.icon === 'weapon' ? window.DZIcons.gun('mosin') : ICO(x.icon));
+    let html = '<div class="hm-head">' + BOLT_MARK + '<div><div class="hm-name">' + esc(m.author || 'STROM') + '</div><div class="hm-sub">' + esc(m.home_subtitle || m.app_subtitle) + '</div></div>' +
+      (m.public_stats && m.public_stats.enabled ? '<div class="live" id="live" hidden></div>' : '') + '</div>';
+    html += '<a href="#search" class="searchbox" style="display:block;text-decoration:none">' + ICONS.search + '<input type="text" readonly tabindex="-1" placeholder="Что ищешь?" style="pointer-events:none"></a>';
+    const hot = (H.hot || []).filter((x) => ok(x.id));
+    if (hot.length) html += '<h2 class="hm-h">Быстрый доступ</h2><nav class="hot" aria-label="Быстрый доступ">' + hot.map((x, i) => '<a href="#' + esc(x.id) + '"' + (i ? '' : ' class="on"') + '><b>' + (i + 1) + '</b>' + ico(x) + '<span>' + esc(x.label) + '</span></a>').join('') + '</nav>';
+    (H.groups || []).forEach((g) => {
+      const it = g.items.filter((x) => ok(x.id));
+      if (it.length) html += '<h2 class="hm-h">' + esc(g.title) + '</h2><div class="inv">' + it.map((x) => '<a href="#' + esc(x.id) + '"' + (x.wide ? ' class="w2"' : '') + '>' + ico(x) + '<span>' + esc(x.label) + '</span></a>').join('') + '</div>';
+    });
+    const used = new Set((H.hot || []).concat(...(H.groups || []).map((g) => g.items), H.refs || []).map((x) => x.id).concat(H.hidden || []));
+    const rest = state.sections.filter((x) => !x.hidden_home && !used.has(x.id)).map((x) => ({ id: x.id, icon: 'book', label: x.title }));
+    const cnt = (n, a, b, c) => n + ' ' + (n % 10 === 1 && n % 100 !== 11 ? a : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? b : c);
+    const sub = (x) => { const n = state.byId[x.id] ? state.byId[x.id].items.length : 0; return x.id === 'loot' ? cnt(n, 'предмет', 'предмета', 'предметов') : x.id === 'slang' ? cnt(n, 'слово', 'слова', 'слов') : x.id === 'week' ? cnt(n, 'чек-лист', 'чек-листа', 'чек-листов') : x.id === 'patch' ? 'патч ' + state.patches.patches[0].version : cnt(n, 'карточка', 'карточки', 'карточек'); };
+    const refs = (H.refs || []).concat(rest).filter((x) => ok(x.id));
+    if (refs.length) html += '<h2 class="hm-h">Справочник</h2><div class="refs">' + refs.map((x) => '<a href="#' + esc(x.id) + '">' + ico(x) + '<span><b>' + esc(x.label) + '</b><small>' + esc(sub(x)) + '</small></span></a>').join('') + '</div>';
     const favRows = favItems();
     if (favRows.length) {
-      html += '<div class="h-section">⭐ Избранное</div><div class="list">' +
-        favRows.slice(0, 5).map(([s, it]) => row(s, it, true)).join('') + '</div>';
-      if (favRows.length > 5) html += '<p style="text-align:center"><a href="#fav">Все избранные (' + favRows.length + ')</a></p>';
+      html += '<div class="h-section">Моё</div><div class="list">' + favRows.slice(0, 5).map(([x, it]) => row(x, it, true)).join('') + '</div>';
+      if (favRows.length > 5) html += '<p><a href="#fav">Всё сохранённое (' + favRows.length + ')</a></p>';
     }
-    html += socialsHTML();
-    html += footer();
+    html += socialsHTML() + footer();
     $view.innerHTML = html;
-    void first;
     liveStats.show();
-  }
-
-  // плитки главной, сгруппированные по meta.home
-  function homeTile(id) {
-    const tile = (href, ico, title, short, cls, count) => '<a class="tile' + (cls ? ' ' + cls : '') + '" href="' + href + '">' +
-      '<span class="t-ico">' + ico + '</span>' +
-      '<span><span class="t-title">' + esc(title) + '</span><br><span class="t-short">' + esc(short) + '</span></span>' +
-      (count != null ? '<span class="t-count">' + count + '</span>' : '') + '</a>';
-    if (id === 'map') return state.map ? tile('#map', '🗺️', 'Карта Чернаруси', 'Навигатор: напиши, где ты, — покажу, куда и как идти', 'wide map-tile') : '';
-    if (id === 'help') return state.symptoms ? tile('#help', '🩺', 'Что со мной?', 'Выбери симптомы — подскажу, что это', 'tool-tile') : '';
-    if (id === 'patch') { if (!state.patches) return ''; const v = state.patches.patches[0]; return tile('#patch', '🆕', 'Что нового в ' + v.version, 'Главное из патча для новичка', 'tool-tile'); }
-    if (id === 'quiz') return state.quiz ? tile('#quiz', '🧠', 'Проверь себя', 'Какой у тебя уровень в DayZ?', 'tool-tile') : '';
-    if (id === 'servers') return state.servers ? tile('#servers', '🖥️', 'Серверы для новичка', 'Как выбрать сервер и где играть — с живым онлайном', 'tool-tile') : '';
-    const s = state.byId[id];
-    if (!s || !s.items) return '';
-    return tile('#' + s.id, esc(s.icon), s.title, s.short || '', s.id === 'first15' ? 'wide' : '', s.id === 'first15' ? null : s.items.length);
-  }
-  function homeGroups() {
-    const groups = (state.meta.home || []).map((g) => ({ ...g, items: g.items.slice() }));
-    const used = new Set(groups.flatMap((g) => g.items));
-    const rest = state.sections.filter((s) => !s.hidden_home).map((s) => s.id).filter((id) => !used.has(id));
-    if (rest.length) groups.push({ title: 'Ещё', icon: '➕', items: rest });
-    if (!groups.length) groups.push({ items: state.sections.map((s) => s.id) });
-    return groups.map((g) => {
-      const arr = g.items.map(homeTile).filter(Boolean);
-      const narrow = arr.filter((t) => !/class="tile wide/.test(t));
-      if (narrow.length % 2 === 1) { const last = narrow[narrow.length - 1]; arr[arr.lastIndexOf(last)] = last.replace('class="tile', 'class="tile span2'); }
-      const tiles = arr.join('');
-      if (!tiles) return '';
-      return (g.title ? '<h2 class="g-head"><span class="g-ico">' + g.icon + '</span>' + esc(g.title) + '</h2>' : '') +
-        '<div class="grid">' + tiles + '</div>';
-    }).join('');
   }
 
   function viewSection(sec, params) {
@@ -407,28 +384,55 @@
     return it ? it.title : s.title;
   }
 
+  const USE_RU = { Military: 'военные объекты', Police: 'полицейские участки', Medic: 'больницы и медпункты', Town: 'дома в городах', Village: 'дома в деревнях', Farm: 'фермы и сараи', Hunting: 'охотничьи вышки и домики', Industrial: 'промзоны и гаражи', Office: 'офисы', School: 'школы', Firefighter: 'пожарные части', Prison: 'тюрьма на острове', Coast: 'побережье', Lunapark: 'парк аттракционов', ContaminatedArea: 'только газовые зоны (нужны ОЗК и противогаз)' };
+  function spawnHTML(it) {
+    const sp = it.spawn;
+    if (!sp || !sp.nominal) return '';
+    const u = (sp.usage || []).map((x) => (x === 'ContaminatedArea' && sp.usage.length > 1 ? 'газовые зоны' : USE_RU[x] || x));
+    const txt = u.length ? u.join(', ') : 'почти в любых зданиях';
+    const T = new Set((sp.tier || []).map((x) => +String(x).replace(/\D/g, '')).filter(Boolean));
+    const gas = (sp.usage || []).join() === 'ContaminatedArea';
+    return '<div class="field"><div class="f-label">Где лежит</div><div class="f-val"><p>' + esc(txt[0].toUpperCase() + txt.slice(1)) + ', до ' + sp.nominal + ' шт. на карте.' + (sp.deloot ? ' Ещё на крушениях вертолётов и других событиях.' : '') + '</p></div>' +
+      (gas ? '' : '<div class="zones">' + [[1, '1, берег'], [2, '2, середина'], [3, '3, север'], [4, '4, СЗ, Тисы']].map((z) => '<div' + (!T.size || T.has(z[0]) ? ' class="on"' : '') + '><i></i>' + z[1] + '</div>').join('') + '</div>') + '</div>';
+  }
+  function slotHTML(sec, it) {
+    if (sec.id !== 'weapons' && !it.spawn) return '';
+    const st = [];
+    if (it.caliber) st.push(['Калибр', it.caliber]);
+    if (it.mag) st.push(['Магазин', it.mag.replace(/ ?\(.*\)/, '').replace(/,? подходят.*/, '').replace(/, барабан.*/, '').replace(/ и барабан.*/, '').replace(/, без магазина/, '').replace(/^Магазины? (КА-74 |STANAG )?(на )?/, '').replace(/^Отъёмный магазин/, 'отъёмный').replace(/^Внутренний на (.+)/, '$1, внутри')]);
+    if (it.spawn) st.push(['Встречается', it.spawn.rarity]);
+    return '<div class="it-slot">' + (sec.id === 'weapons' ? '<div class="it-pic">' + window.DZIcons.gun(it.id) + '</div>' : '') +
+      '<div class="it-stats">' + st.map((x) => '<div><small>' + x[0] + '</small><b>' + esc(x[1]) + '</b></div>').join('') + '</div></div>';
+  }
+
   function viewDetail(sec, it) {
     setChrome(sec.title, null, true);
     const k = favKey(sec.id, it.id);
     const on = state.favs.has(k);
-    let html = '<article class="detail">' +
+    const isGun = sec.id === 'weapons', sp = !!(it.spawn && it.spawn.nominal);
+    let html = '<article class="detail">' + slotHTML(sec, it) +
       '<div class="d-head"><div class="d-titles"><h2 class="d-title">' + esc(it.title) + '</h2>' +
-      (it.title_en ? '<div class="d-en">' + esc(it.title_en) + '</div>' : '') + '</div>' +
+      (it.title_en && it.title_en !== it.title ? '<div class="d-en">' + esc(it.title_en) + '</div>' : '') + '</div>' +
       '<button class="star' + (on ? ' on' : '') + '" data-fav="' + esc(k) + '" aria-pressed="' + on + '" aria-label="Избранное">' + ICONS.star + '</button></div>';
-    const b = badges(sec, it);
+    const b = isGun ? (it.needs_check && state.meta.show_needs_check ? '<span class="badge warn">проверить</span>' : '') : badges(sec, it);
     if (b) html += '<div class="d-badges">' + b + '</div>';
     const pic = img(it);
     if (pic) {
       html += '<figure class="d-img"><img src="' + esc(pic.src) + '" alt="' + esc(it.title) + '" decoding="async">' +
         (pic.caption ? '<figcaption>' + esc(pic.caption) + '</figcaption>' : '') + '</figure>';
     }
-    if (it.summary) html += '<p class="d-sum">' + esc(it.summary) + '</p>';
+    if (it.summary || (isGun && it.tip)) html += '<p class="d-sum">' + esc(it.summary || it.tip) + '</p>';
     if (it.needs_check && state.meta.show_needs_check) {
       html += '<div class="needs-check">⚠ Эту карточку ещё нужно сверить с актуальной версией игры' +
         (it.check_note ? ': ' + esc(it.check_note) : '.') + '</div>';
     }
     html += '<div class="fields">';
-    for (const f of sec.fields || []) html += fieldHTML(sec, it, f);
+    if (sp) html += spawnHTML(it);
+    for (const f of sec.fields || []) {
+      if (isGun && (['caliber', 'tip'].includes(f.key) || (f.key === 'mag' && !/\(|,|барабан/.test(it.mag || '')))) continue;
+      if (sp && f.key === 'where') continue;
+      html += fieldHTML(sec, it, f);
+    }
     if (it.text) html += '<div class="field"><div class="f-label">Подробнее</div><div class="f-val">' + md(it.text) + '</div></div>';
     html += '</div>';
     if (it.see && /^#[\w\-\/?=.%а-яё ]+$/i.test(it.see)) {
@@ -436,7 +440,7 @@
       html += '<a class="btn see" href="' + esc(it.see) + '">→ ' + esc(t) + '</a>';
     }
     html += '<div class="d-actions">' +
-      '<button class="btn' + (on ? ' on' : '') + '" data-fav="' + esc(k) + '">' + '<span class="lbl">' + (on ? 'В избранном' : 'В избранное') + '</span></button>' +
+      '<button class="btn' + (on ? ' on' : '') + '" data-fav="' + esc(k) + '">' + '<span class="lbl">' + (on ? 'Сохранено' : 'Сохранить') + '</span></button>' +
       '<button class="btn" data-share>' + ICONS.share + 'Поделиться</button></div>';
     if (it.spawn && it.spawn.nominal > 0 && state.map) html += '<a class="btn map-btn" href="#map?loot=' + esc(sec.id) + '/' + esc(it.id) + '">🗺️ Где искать на карте</a>';
     if (fbOn()) html += '<button class="fb-link" data-fb>⚠️ Нашёл ошибку в карточке</button>';
@@ -535,7 +539,7 @@
   }
 
   function viewFav() {
-    setChrome('Избранное', 'fav', false);
+    setChrome('Моё', 'fav', false);
     const items = favItems();
     $view.innerHTML = (items.length
       ? '<div class="list">' + items.map(([s, it]) => row(s, it, true)).join('') + '</div>'
@@ -543,7 +547,7 @@
   }
 
   function viewAbout() {
-    setChrome('Инфо', 'about', false);
+    setChrome('О гайде', null, true);
     const m = state.meta;
     const total = state.sections.reduce((a, s) => a + s.items.length, 0);
     const toCheck = state.sections.reduce((a, s) => a + s.items.filter((i) => i.needs_check).length, 0);
@@ -552,7 +556,6 @@
       '<p>Шпаргалка по DayZ для новичков: первые ~10 часов игры. Только ванильная игра, без модов.</p>' +
       '<p>Карточек: <b>' + total + '</b>' + (toCheck ? ' · на проверке: <b>' + toCheck + '</b>' : '') + '</p>' +
       '<h3>Значки</h3><div class="legend">' +
-      '<div><span class="badge ok">Новичку</span> — пригодится в первые часы</div>' +
       '<div><span class="badge warn">⚠ проверить</span> — данные ещё сверяются с актуальной версией</div>' +
       '<div><span class="badge bad">Опасно</span> / <span class="badge warn">Осторожно</span> / <span class="badge ok">Безопасно</span></div></div>' +
       '<h3>Как установить на iPhone</h3>' +
@@ -694,7 +697,7 @@
   const km = (m) => (m < 950 ? Math.max(0, Math.round(m / 10) * 10) + ' м' : (m / 1000).toFixed(1).replace('.', ',') + ' км');
 
   function viewMap(focusId, params) {
-    setChrome('Карта Чернаруси', null, true);
+    setChrome('Карта Чернаруси', 'map', true);
     const DM = window.DZMap, NAV = window.DZNav;
     if (!state.map || !DM) { $view.innerHTML = '<div class="empty">Не удалось загрузить карту. Проверь интернет и обнови страницу.</div>'; return; }
     const M = state.map;
@@ -1091,7 +1094,7 @@
         const todo = it.treatment || it.how || it.summary || '';
         const pct = Math.round(Math.min(1, x.score / Math.max(best, 1)) * 100);
         return '<a class="help-card' + (i === 0 ? ' top' : '') + '" href="#' + esc(sec.id) + '/' + esc(it.id) + '">' +
-          '<div class="hc-head"><span class="hc-title">' + esc(it.title) + (it.title_en ? ' <span class="r-en">(' + esc(it.title_en) + ')</span>' : '') + '</span>' +
+          '<div class="hc-head"><span class="hc-title">' + esc(it.title) + (it.title_en && it.title_en !== it.title ? ' <span class="r-en">(' + esc(it.title_en) + ')</span>' : '') + '</span>' +
           '<span class="hc-sec">' + esc(sec.icon) + '</span></div>' +
           '<div class="hc-bar"><i style="width:' + pct + '%"></i></div>' +
           (x.c.hint ? '<div class="hc-hint">❓ ' + esc(x.c.hint) + '</div>' : '') +
@@ -1116,13 +1119,13 @@
     let onlyStar = false;
     const render = () => {
       $view.innerHTML = '<div class="chips"><button class="chip' + (onlyStar ? '' : ' on') + '" data-f="all">Всё</button>' +
-        '<button class="chip' + (onlyStar ? ' on' : '') + '" data-f="star">⭐ Важное новичку</button></div>' +
+        '<button class="chip' + (onlyStar ? ' on' : '') + '" data-f="star">Важное новичку</button></div>' +
         P.patches.map((v) => {
           const groups = v.groups.map((g) => {
             const items = g.items.filter((x) => !onlyStar || x.star);
             if (!items.length) return '';
             return '<div class="pg-title">' + esc(g.title) + '</div><ul class="pg-list">' + items.map((x) =>
-              '<li class="' + (x.star ? 'star-item' : '') + '">' + (x.star ? '⭐ ' : '') + esc(x.text) +
+              '<li class="' + (x.star ? 'star-item' : '') + '">' + esc(x.text) +
               (x.link ? ' <a href="' + esc(x.link) + '">→</a>' : '') + '</li>').join('') + '</ul>';
           }).join('');
           if (!groups) return '';
@@ -1148,7 +1151,7 @@
     $title.textContent = tab === 'home' ? '' : title;
     $back.hidden = !showBack;
     document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('active', t.dataset.tab === tab));
-    document.body.classList.toggle('is-home', tab === 'home');
+    document.body.classList.toggle('is-home', tab === 'home'); document.body.classList.remove('bar-hide');
     document.body.classList.remove('bar-hide');
     document.title = title === 'DayZ Guide' ? 'DayZ Guide' : title + ' · DayZ Guide';
   }
@@ -1161,6 +1164,7 @@
 
   // ---------- роутер ----------
   function route() {
+    document.querySelectorAll('.fb-modal').forEach((x) => x.remove());
     const prev = state.lastHash;
     if (prev != null) state.scroll[prev] = window.scrollY;
     const hash = location.hash || '#';

@@ -333,54 +333,127 @@
   "feedback": {
     "endpoint": "https://dayz-feedback.boss-c-c12361.workers.dev"
   },
-  "home": [
-    {
-      "title": "Начни здесь",
-      "icon": "🚀",
-      "items": [
-        "first15",
-        "week",
-        "controls",
-        "hud",
-        "loadout",
-        "servers"
-      ]
-    },
-    {
-      "items": [
-        "map",
-        "quiz"
-      ]
-    },
-    {
-      "title": "Выживание",
-      "icon": "❤️",
-      "items": [
-        "help",
-        "food",
-        "diseases",
-        "injuries",
-        "fire",
-        "crafting"
-      ]
-    },
-    {
-      "title": "Бой и игроки",
-      "icon": "⚔️",
-      "items": [
-        "weapons",
-        "infected",
-        "players"
-      ]
-    },
-    {
-      "title": "Справочники",
-      "icon": "📚",
-      "items": [
-        "loot",
-        "slang",
-        "patch"
-      ]
-    }
-  ]
+  "home": {
+    "hot": [
+      {
+        "id": "first15",
+        "icon": "clock",
+        "label": "15 минут"
+      },
+      {
+        "id": "help",
+        "icon": "pulse",
+        "label": "Симптомы"
+      },
+      {
+        "id": "map",
+        "icon": "map",
+        "label": "Карта"
+      },
+      {
+        "id": "servers",
+        "icon": "server",
+        "label": "Серверы"
+      },
+      {
+        "id": "quiz",
+        "icon": "quiz",
+        "label": "Тест"
+      }
+    ],
+    "groups": [
+      {
+        "title": "Выжить",
+        "items": [
+          {
+            "id": "food",
+            "icon": "can",
+            "label": "Еда, вода"
+          },
+          {
+            "id": "diseases",
+            "icon": "microbe",
+            "label": "Болезни"
+          },
+          {
+            "id": "injuries",
+            "icon": "blood",
+            "label": "Ранения"
+          },
+          {
+            "id": "fire",
+            "icon": "fire",
+            "label": "Огонь"
+          },
+          {
+            "id": "crafting",
+            "icon": "tools",
+            "label": "Крафт"
+          },
+          {
+            "id": "loadout",
+            "icon": "pack",
+            "label": "Рюкзак"
+          },
+          {
+            "id": "hud",
+            "icon": "hud",
+            "label": "Значки"
+          },
+          {
+            "id": "controls",
+            "icon": "keys",
+            "label": "Клавиши"
+          }
+        ]
+      },
+      {
+        "title": "Бой и лут",
+        "items": [
+          {
+            "id": "weapons",
+            "icon": "weapon",
+            "label": "Оружие и патроны",
+            "wide": true
+          },
+          {
+            "id": "infected",
+            "icon": "zombie",
+            "label": "Зомби"
+          },
+          {
+            "id": "players",
+            "icon": "person",
+            "label": "Игроки"
+          }
+        ]
+      }
+    ],
+    "refs": [
+      {
+        "id": "loot",
+        "icon": "search",
+        "label": "Где найти"
+      },
+      {
+        "id": "week",
+        "icon": "calendar",
+        "label": "Первая неделя"
+      },
+      {
+        "id": "slang",
+        "icon": "chat",
+        "label": "Сленг"
+      },
+      {
+        "id": "patch",
+        "icon": "fresh",
+        "label": "Что нового"
+      }
+    ],
+    "hidden": [
+      "srv"
+    ]
+  },
+  "home_subtitle": "Гайд по DayZ для новичка"
 }
